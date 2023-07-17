@@ -1,6 +1,7 @@
 library(rvest)
 library(curl)
 library(dplyr)
+library(here)
 
 remove_double_space = function(x) {
   gsub("\\s+", " ", x)
@@ -16,7 +17,7 @@ read_html_newline = function(file) {
 }
 
 get_version_filenames = function(version) {
-  data_dir = here::here("raw", version)
+  data_dir = here::here("data", "raw", version)
   if (!dir.exists(data_dir)) {
     dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
   }
