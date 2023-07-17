@@ -4,8 +4,7 @@ then
   version=pax_h
 fi
 
-bucket=nhanes_80hz
-outdir=${version}/raw
+outdir=data/raw/${version}
 echo "outdir is ${outdir}"
 mkdir -p ${outdir}
 # index
@@ -23,12 +22,6 @@ do
    # do something with $line here
   file=${id}.tar.bz2
   outfile=${outdir}/${file}
-  bucket_file=gs://${bucket}/${outfile}
-  echo "running gsutil stat ${bucket_file}"
-  # you need the -q!!!!!
-  gsutil -q stat ${bucket_file};
-  if [ $? -ne  0 ];
-  then
     # echo "ls ${outdir}"
     # ls -al ${outdir}
     if [ ! -f ${outfile} ];
@@ -36,12 +29,6 @@ do
       echo "Downloading File"
       curl -p --insecure  "https://ftp.cdc.gov/pub/${version}/${file}" -o "${outfile}"
     fi
-
-    echo "Uploading File `pwd`/${outfile} gs://${bucket}/${outfile}"
-    gsutil -m cp `pwd`/${outfile} ${bucket_file}
-    # echo "ls ${outdir}"
-    # ls -al ${outdir}
-    # gsutil -m rsync ${outdir} gs://${bucket}/${outdir}
   fi
 
   rm -f ${outfile}

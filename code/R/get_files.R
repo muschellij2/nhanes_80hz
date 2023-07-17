@@ -5,8 +5,7 @@ source("helper_functions.R")
 version = "pax_h"
 
 bucket = "nhanes_80hz"
-bucket_setup(bucket)
-trailrun::cr_gce_setup(bucket = bucket)
+
 
 index = 1
 

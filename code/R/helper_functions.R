@@ -103,29 +103,6 @@ bucket_setup = function(bucket, project = NULL) {
   }
 }
 
-gcs_download = function(file, ...) {
-  dir.create(dirname(file), showWarnings = FALSE, recursive = TRUE)
-  googleCloudStorageR::gcs_get_object(
-    file,
-    saveToDisk = file,
-    ...
-  )
-  file
-}
-
-gcs_upload_file = function(file, ...) {
-  googleCloudStorageR::gcs_upload(file = file, name = file, ...)
-}
-
-get_gcs_data = function() {
-  gcs = googleCloudStorageR::gcs_list_objects()
-  gcs = gcs %>%
-    rename(file = name) %>%
-    filter(!grepl("/$", file))
-  gcs = gcs %>%
-    tidyr::separate(file, sep = "/", into = c("version", "folder", "name"),
-                    remove = FALSE)
-}
 get_wide_data = function() {
   gcs = get_gcs_data()
   wide = gcs %>%

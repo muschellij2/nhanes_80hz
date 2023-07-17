@@ -15,11 +15,10 @@ read_html_newline = function(file) {
   writeLines(xx, tfile)
   doc = read_html(tfile)
 }
-nhanes_version = "pax_h"
 
 get_version_filenames = function(nhanes_version) {
   filename = NULL
-  rm(list=ls())
+  rm(list = c("filename"))
   data_dir = here::here("data", "raw", nhanes_version)
   if (!dir.exists(data_dir)) {
     dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
@@ -80,5 +79,5 @@ get_version_filenames = function(nhanes_version) {
 }
 
 
-get_version_filenames("pax_h")
 get_version_filenames("pax_g")
+get_version_filenames("pax_h")
