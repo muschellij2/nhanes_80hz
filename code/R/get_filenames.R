@@ -62,14 +62,14 @@ get_version_filenames = function(nhanes_version) {
     mutate(
       day_of_week = sub(",$", "", day_of_week),
       url = paste0(base_url, hrefs),
-      file = file.path(nhanes_version, "raw", filename),
+      file = here::here("data", "raw", nhanes_version, filename),
       # 2x because tar.bz2
       id = tools::file_path_sans_ext(filename),
       id = tools::file_path_sans_ext(id),
-      parquet = file.path(nhanes_version, "parquet",paste0(id, ".parquet")),
-      meta = file.path(nhanes_version, "meta",paste0(id, ".csv.gz")),
-      logfile = file.path(nhanes_version, "logs", paste0(id, ".csv.gz")),
-      full_csv = file.path(nhanes_version, "csv", paste0(id, ".csv.gz"))
+      parquet = here::here("data", "parquet", nhanes_version, paste0(id, ".parquet")),
+      meta =  here::here("data", "meta", nhanes_version, paste0(id, ".csv.gz")),
+      logfile =  here::here("data", "logs", nhanes_version, paste0(id, ".csv.gz")),
+      full_csv =  here::here("data", "csv", nhanes_version, paste0(id, ".csv.gz"))
     ) %>%
     select(id, url, file, filename, everything())
   readr::write_rds(df, file.path(data_dir, paste0(nhanes_version, "_filenames.rds")))

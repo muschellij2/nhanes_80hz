@@ -1,11 +1,8 @@
 library(googleCloudStorageR)
 library(arrow)
 library(magrittr)
-source("helper_functions.R")
+source(here::here("code", "R", "helper_functions.R"))
 version = "pax_h"
-
-bucket = "nhanes_80hz"
-
 
 index = 1
 
