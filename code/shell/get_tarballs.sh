@@ -4,12 +4,13 @@ then
   version=pax_h
 fi
 
-outdir=data/raw/${version}
+raw_dir=data/raw
+outdir=${raw_dir}/${version}
 echo "outdir is ${outdir}"
 mkdir -p ${outdir}
 # index
-# sed "${NUM}q;d" file
-ids=`cat ${version}_folds.txt | grep " ${fold}$" | awk '{ print $1 }'`
+id_file=${raw_dir}/${version}_ids.txt
+ids=`cat ${id_file}`
 # cat sample_data_1.txt | awk 'NR==25'
 echo "ls `pwd`"
 ls -al
@@ -19,7 +20,7 @@ ls -al
 for id in ${ids};
 do
   echo ${id}
-   # do something with $line here
+  # do something with $line here
   file=${id}.tar.bz2
   outfile=${outdir}/${file}
     # echo "ls ${outdir}"
@@ -35,4 +36,5 @@ do
 done
 
 
+curl --remote-name-all https://ftp.cdc.gov/pub/${version}/{73557,73558,73559,73560,73561}.tar.bz2
 
