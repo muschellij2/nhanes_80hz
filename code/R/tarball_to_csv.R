@@ -34,6 +34,7 @@ for (index in seq(max_n)) {
     tarball_df(raw = files$raw,
                csv = files$csv,
                logfile = files$logfile,
-               meta = files$meta)
+               meta = files$meta
+    )
   }
 }

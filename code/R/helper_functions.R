@@ -1,12 +1,12 @@
 have_pigz = function() {
   pigz = Sys.which("pigz")
-  !nzchar(pigz)
+  !nzchar(pigz) || nchar(system("which pigz", intern = TRUE)) > 0
 }
 
 pigz = function(
-  filename,
-  overwrite = FALSE,
-  compression = 9
+    filename,
+    overwrite = FALSE,
+    compression = 9
 ) {
 
   destname = paste0(filename, ".gz")
@@ -247,11 +247,11 @@ csv_collapse = function(files, outfile = NULL, id = NULL) {
 }
 
 tarball_df = function(
-  raw,
-  csv,
-  logfile,
-  meta,
-  ...) {
+    raw,
+    csv,
+    logfile,
+    meta,
+    ...) {
   dir.create(dirname(csv), showWarnings = FALSE, recursive = TRUE)
   dir.create(dirname(logfile), showWarnings = FALSE, recursive = TRUE)
   dir.create(dirname(meta), showWarnings = FALSE, recursive = TRUE)
@@ -274,9 +274,13 @@ tarball_df = function(
   }
   csv_files = files[!grepl("_log", files, ignore.case = TRUE)]
   df = vroom::vroom(csv_files, num_threads = 2,
-               col_types = col_types_80hz)
-  vroom::vroom_write(df, file = csv, delim = ",")
-  attr(df, "log_file") = tfile
+                    col_types = col_types_80hz)
+  file = csv
+  if (have_pigz()) {
+    file = pipe(paste0("pigz -9 --processes 2 > ", csv))
+  }
+  vroom::vroom_write(df, file = file, delim = ",")
+  attr(df, "log_file") = logfile
   attr(df, "meta_df") = meta_df
 
   return(df)
