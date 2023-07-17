@@ -250,10 +250,14 @@ tarball_df = function(
     raw,
     logfile,
     meta,
+    cleanup = TRUE,
     ...) {
   dir.create(dirname(logfile), showWarnings = FALSE, recursive = TRUE)
   dir.create(dirname(meta), showWarnings = FALSE, recursive = TRUE)
   tdir = tempfile()
+  if (cleanup) {
+    on.exit(unlink(tdir), add = TRUE)
+  }
   dir.create(tdir, showWarnings = TRUE)
   exit_code = untar(tarfile = raw, exdir = tdir, verbose = TRUE)
   stopifnot(exit_code == 0)
@@ -286,7 +290,8 @@ tarball_to_csv = function(raw,
                           ...) {
   dir.create(dirname(csv), showWarnings = FALSE, recursive = TRUE)
   message("creating a df")
-  df = tarball_df(raw = raw, logfile = logfile, meta = meta)
+  df = tarball_df(raw = raw, logfile = logfile, meta = meta,
+                  ...)
   message("writing csv")
   file = csv
   if (have_pigz()) {
