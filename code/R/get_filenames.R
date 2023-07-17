@@ -15,15 +15,18 @@ read_html_newline = function(file) {
   writeLines(xx, tfile)
   doc = read_html(tfile)
 }
+nhanes_version = "pax_h"
 
-get_version_filenames = function(version) {
-  data_dir = here::here("data", "raw", version)
+get_version_filenames = function(nhanes_version) {
+  filename = NULL
+  rm(list=ls())
+  data_dir = here::here("data", "raw", nhanes_version)
   if (!dir.exists(data_dir)) {
     dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
   }
-  file = paste0(version, "_index.html")
+  file = file.path(data_dir, paste0(nhanes_version, "_index.html"))
   base_url = "https://ftp.cdc.gov"
-  url = paste0(base_url, "/pub/", version, "/")
+  url = paste0(base_url, "/pub/", nhanes_version, "/")
   if (!file.exists(file)) {
     curl::curl_download(url, destfile = file)
   }
@@ -37,7 +40,7 @@ get_version_filenames = function(version) {
   stubs = unique(dirname(hrefs))
   stopifnot(length(stubs) == 1)
 
-  stopifnot(stubs == paste0("/pub/", version))
+  stopifnot(stubs == paste0("/pub/", nhanes_version))
 
   doc = read_html_newline(file) %>%
     html_nodes("pre")
@@ -54,25 +57,25 @@ get_version_filenames = function(version) {
                    "bytes", "filename")
   df = as_tibble(df)
   df = df %>%
-    filter(tools::file_ext(filename) %in% "bz2")
+    dplyr::filter(tools::file_ext(filename) %in% "bz2")
 
   df = df %>%
     mutate(
       day_of_week = sub(",$", "", day_of_week),
       url = paste0(base_url, hrefs),
-      file = file.path(version, "raw", filename),
+      file = file.path(nhanes_version, "raw", filename),
       # 2x because tar.bz2
       id = tools::file_path_sans_ext(filename),
       id = tools::file_path_sans_ext(id),
-      parquet = file.path(version, "parquet",paste0(id, ".parquet")),
-      meta = file.path(version, "meta",paste0(id, ".csv.gz")),
-      logfile = file.path(version, "logs", paste0(id, ".csv.gz")),
-      full_csv = file.path(version, "csv", paste0(id, ".csv.gz"))
+      parquet = file.path(nhanes_version, "parquet",paste0(id, ".parquet")),
+      meta = file.path(nhanes_version, "meta",paste0(id, ".csv.gz")),
+      logfile = file.path(nhanes_version, "logs", paste0(id, ".csv.gz")),
+      full_csv = file.path(nhanes_version, "csv", paste0(id, ".csv.gz"))
     ) %>%
     select(id, url, file, filename, everything())
-  readr::write_rds(df, paste0(version, "_filenames.rds"))
+  readr::write_rds(df, file.path(data_dir, paste0(nhanes_version, "_filenames.rds")))
 
-  writeLines(df$id, paste0(version, "_ids.txt"))
+  writeLines(df$id, file.path(data_dir, paste0(nhanes_version, "_ids.txt")))
   return(df)
 }
 
