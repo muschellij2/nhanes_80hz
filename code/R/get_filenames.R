@@ -19,7 +19,7 @@ read_html_newline = function(file) {
 get_version_filenames = function(nhanes_version) {
   filename = NULL
   rm(list = c("filename"))
-  data_dir = here::here("data", "raw", nhanes_version)
+  data_dir = here::here("data", "raw")
   if (!dir.exists(data_dir)) {
     dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
   }
