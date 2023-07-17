@@ -30,10 +30,12 @@ for (index in seq(max_n)) {
   )
 
   if (!all(file.exists(unlist(files)))) {
-    tarball_to_csv(raw = files$raw,
-                   csv = files$csv,
-                   logfile = files$logfile,
-                   meta = files$meta
+    x = tarball_to_csv(raw = files$raw,
+                       csv = files$csv,
+                       logfile = files$logfile,
+                       meta = files$meta
     )
+    # doing this so .Last.value isn't maintained
+    rm(x)
   }
 }
