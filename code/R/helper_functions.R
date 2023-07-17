@@ -248,11 +248,9 @@ csv_collapse = function(files, outfile = NULL, id = NULL) {
 
 tarball_df = function(
     raw,
-    csv,
     logfile,
     meta,
     ...) {
-  dir.create(dirname(csv), showWarnings = FALSE, recursive = TRUE)
   dir.create(dirname(logfile), showWarnings = FALSE, recursive = TRUE)
   dir.create(dirname(meta), showWarnings = FALSE, recursive = TRUE)
   tdir = tempfile()
@@ -275,27 +273,28 @@ tarball_df = function(
   csv_files = files[!grepl("_log", files, ignore.case = TRUE)]
   df = vroom::vroom(csv_files, num_threads = 2,
                     col_types = col_types_80hz)
-  file = csv
-  if (have_pigz()) {
-    file = pipe(paste0("pigz -9 --processes 2 > ", csv))
-  }
-  vroom::vroom_write(df, file = file, delim = ",")
   attr(df, "log_file") = logfile
   attr(df, "meta_df") = meta_df
 
   return(df)
 }
 
-tarball_to_csv = function(tarball, file, cleanup = TRUE) {
-  dir.create(dirname(tarball), recursive = TRUE, showWarnings = FALSE)
-  if (!file.exists(tarball)) {
-    gcs_download(tarball)
-  }
+tarball_to_csv = function(raw,
+                          csv,
+                          logfile,
+                          meta,
+                          ...) {
+  dir.create(dirname(csv), showWarnings = FALSE, recursive = TRUE)
   message("creating a df")
-  df = tarball_df(tarball, cleanup = cleanup)
+  df = tarball_df(raw = raw, logfile = logfile, meta = meta)
   message("writing csv")
+  file = csv
+  if (have_pigz()) {
+    file = pipe(paste0("pigz -9 --processes 2 > ", csv))
+  }
   # need this because of return(x), no duplicate
-  df = vroom::vroom_write(df, file = file, delim = ",", num_threads = 1)
+  df = vroom::vroom_write(df, file = file, delim = ",", num_threads = 2)
+
   for (i in 1:3) gc()
   return(df)
 }

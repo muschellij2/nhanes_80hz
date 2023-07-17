@@ -31,10 +31,10 @@ for (index in seq(max_n)) {
   )
 
   if (!all(file.exists(unlist(files)))) {
-    tarball_df(raw = files$raw,
-               csv = files$csv,
-               logfile = files$logfile,
-               meta = files$meta
+    tarball_to_csv(raw = files$raw,
+                   csv = files$csv,
+                   logfile = files$logfile,
+                   meta = files$meta
     )
   }
 }
