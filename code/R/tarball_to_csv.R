@@ -16,10 +16,9 @@ xdf = df
 df = df %>%
   dplyr::filter(file.exists(file))
 
-raw = df$file[1]
+# raw = df$file[1]
 
 max_n = min(1000, nrow(df))
-# for (index in seq(nrow(df))) {
 for (index in seq(max_n)) {
   print(index)
   idf = df[index,]
