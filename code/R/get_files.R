@@ -1,7 +1,5 @@
 library(magrittr)
 library(dplyr)
-source(here::here("code", "R", "helper_functions.R"))
-version = "pax_h"
 
 index = 1
 
@@ -9,9 +7,15 @@ index = 1
 #                          upload = TRUE) {
 
 stopifnot(length(index) == 1)
-xdf = df = readr::read_rds(
-  here::here("data", "raw", paste0(version, "_filenames.rds"))
-)
+dfs = lapply(c("pax_h", "pax_g"), function(version) {
+  readr::read_rds(
+    here::here("data", "raw", paste0(version, "_filenames.rds"))
+  )
+})
+df = dplyr::bind_rows(dfs)
+xdf = df
+# reorder them so we can download some random
+df = df[sample(nrow(df)),]
 df = df %>%
   dplyr::filter(!file.exists(file))
 

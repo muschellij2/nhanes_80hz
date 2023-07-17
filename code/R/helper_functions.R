@@ -248,65 +248,37 @@ csv_collapse = function(files, outfile = NULL, id = NULL) {
 
 tarball_df = function(
   raw,
-  cleanup = TRUE,
-  outfile = NULL,
+  csv,
+  logfile,
+  meta,
   ...) {
+  dir.create(dirname(csv), showWarnings = FALSE, recursive = TRUE)
+  dir.create(dirname(logfile), showWarnings = FALSE, recursive = TRUE)
+  dir.create(dirname(meta), showWarnings = FALSE, recursive = TRUE)
   tdir = tempfile()
   dir.create(tdir, showWarnings = TRUE)
-  exit_code = untar(tarfile = raw, exdir = tdir)
+  exit_code = untar(tarfile = raw, exdir = tdir, verbose = TRUE)
   stopifnot(exit_code == 0)
 
   files = list.files(path = tdir, full.names = FALSE, recursive = TRUE)
   meta_df = make_meta_df_from_files(files)
-
-  ###################################
-  # Get time ranges
-  ###################################
-  # first_file = which(meta_df$date == min(meta_df$date, na.rm = TRUE))
-  # last_file = which(meta_df$date == max(meta_df$date, na.rm = TRUE))
-  # extract_files = meta_df$file[c(first_file, last_file)]
-  # ds = getOption("digits.secs")
-  # on.exit({
-  #   options(digits.secs = ds)
-  # }, add = TRUE)
-  # options(digits.secs = 3)
-  # dates = lapply(file.path(tdir, extract_files), readr::read_csv)
-  # dates = lapply(dates, function(x) range(x$HEADER_TIMESTAMP))
-  # dates = unlist(dates)
-  # dates = as.POSIXct(dates, origin = lubridate::origin)
-  # rtime = as.character(range(dates))
-  # start_time = rtime[1]
-  # stop_time = rtime[2]
+  readr::write_csv(meta_df, file = meta)
 
   files = list.files(path = tdir, full.names = TRUE)
-  log_file = files[grepl("_log", files, ignore.case = TRUE)]
-  tfile = NULL
-  if (length(log_file) == 1) {
-    tfile = tempfile(fileext = ".csv.gz")
-    R.utils::gzip(log_file, destname = tfile,
+  included_log_file = files[grepl("_log", files, ignore.case = TRUE)]
+  stopifnot(length(included_log_file) <= 1)
+  if (length(included_log_file) == 1) {
+    R.utils::gzip(included_log_file, destname = logfile,
                   remove = FALSE, overwrite = TRUE,
                   compression = 9)
   }
   csv_files = files[!grepl("_log", files, ignore.case = TRUE)]
-  res_file = csv_collapse(csv_files, outfile = outfile, id = id)
-  df = readr::read_csv(res_file,
-                       show_col_types = FALSE,
-                       col_types = col_types_80hz,
-                       ...)
-  if (is.null(outfile)) {
-    file.remove(res_file)
-  }
-  # df = purrr::map_dfr(csv_files, readr::read_csv,
-  #                     show_col_types = FALSE, progress = FALSE,
-  #                     col_types = col_types_80hz,
-  #                     ...)
+  df = vroom::vroom(csv_files, num_threads = 2,
+               col_types = col_types_80hz)
+  vroom::vroom_write(df, file = csv, delim = ",")
   attr(df, "log_file") = tfile
-  if (cleanup) {
-    unlink(tdir, recursive = TRUE)
-  }
   attr(df, "meta_df") = meta_df
 
-  # log = readr::read_csv(log_file)
   return(df)
 }
 
