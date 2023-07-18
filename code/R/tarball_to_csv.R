@@ -11,6 +11,7 @@ dfs = lapply(c("pax_h", "pax_g"), function(version) {
   )
 })
 df = dplyr::bind_rows(dfs)
+df = df[1:1000,]
 df = df %>%
   mutate(fold = seq(dplyr::n()),
          fold = floor(fold / floor(dplyr::n()/n_folds) + 1))
