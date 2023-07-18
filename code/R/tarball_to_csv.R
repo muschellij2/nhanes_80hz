@@ -19,6 +19,8 @@ ifold = as.numeric(ifold)
 if (is.na(ifold)) {
   ifold = 2
 }
+
+print(ifold)
 xdf = df
 
 df = df %>%
@@ -30,8 +32,9 @@ df = df %>%
 
 max_n = min(1000, nrow(df))
 for (index in seq(max_n)) {
-  print(index)
+  # print(index)
   idf = df[index,]
+  print(idf$file)
   files = list(
     raw = idf$file,
     csv = idf$full_csv,
