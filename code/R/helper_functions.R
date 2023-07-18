@@ -313,6 +313,7 @@ tarball_to_csv = function(raw,
   # need this because of return(x), no duplicate
   df = vroom::vroom_write(df, file = file, delim = ",",
                           num_threads = num_threads)
+  message("CSV written")
 
   for (i in 1:3) gc()
   return(df)
