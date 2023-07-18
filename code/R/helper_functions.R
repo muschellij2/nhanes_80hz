@@ -251,6 +251,7 @@ tarball_df = function(
     logfile,
     meta,
     cleanup = TRUE,
+    num_threads = 1,
     ...) {
   dir.create(dirname(logfile), showWarnings = FALSE, recursive = TRUE)
   dir.create(dirname(meta), showWarnings = FALSE, recursive = TRUE)
@@ -275,7 +276,7 @@ tarball_df = function(
                   compression = 9)
   }
   csv_files = files[!grepl("_log", files, ignore.case = TRUE)]
-  df = vroom::vroom(csv_files, num_threads = 2,
+  df = vroom::vroom(csv_files, num_threads = num_threads,
                     col_types = col_types_80hz)
   attr(df, "log_file") = logfile
   attr(df, "meta_df") = meta_df
@@ -292,7 +293,10 @@ tarball_to_csv = function(raw,
   # print("Number of threads: ", num_threads)
   dir.create(dirname(csv), showWarnings = FALSE, recursive = TRUE)
   message("creating a df")
-  df = tarball_df(raw = raw, logfile = logfile, meta = meta,
+  df = tarball_df(raw = raw,
+                  logfile = logfile,
+                  meta = meta,
+                  num_threads = num_threads,
                   ...)
   message("writing csv")
   file = csv
