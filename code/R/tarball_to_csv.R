@@ -47,7 +47,8 @@ for (index in seq(max_n)) {
     x = tarball_to_csv(raw = files$raw,
                        csv = files$csv,
                        logfile = files$logfile,
-                       meta = files$meta
+                       meta = files$meta,
+                       num_threads = 1
     )
     # doing this so .Last.value isn't maintained
     rm(x)
