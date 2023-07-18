@@ -73,6 +73,8 @@ get_version_filenames = function(nhanes_version) {
       full_csv =  here::here("data", "csv", nhanes_version, paste0(id, ".csv.gz"))
     ) %>%
     select(id, url, file, filename, everything())
+  df = df %>%
+    dplyr::mutate(version = nhanes_version)
   readr::write_rds(df, file.path(data_dir, paste0(nhanes_version, "_filenames.rds")))
 
   writeLines(df$id, file.path(data_dir, paste0(nhanes_version, "_ids.txt")))
