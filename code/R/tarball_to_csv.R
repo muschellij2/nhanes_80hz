@@ -1,7 +1,7 @@
 library(magrittr)
 library(dplyr)
 source(here::here("code", "R", "helper_functions.R"))
-
+n_folds = 20
 index = 1
 
 stopifnot(length(index) == 1)
@@ -11,8 +11,18 @@ dfs = lapply(c("pax_h", "pax_g"), function(version) {
   )
 })
 df = dplyr::bind_rows(dfs)
+df = df %>%
+  mutate(fold = seq(dplyr::n()),
+         fold = (fold %% n_folds) + 1)
+ifold = Sys.getenv("SGE_TASK_ID")
+ifold = as.numeric(ifold)
+if (is.na(ifold)) {
+  ifold = 2
+}
 xdf = df
 
+df = df %>%
+  dplyr::filter(fold %in% ifold)
 df = df %>%
   dplyr::filter(file.exists(file))
 
