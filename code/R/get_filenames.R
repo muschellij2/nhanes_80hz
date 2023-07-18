@@ -92,5 +92,5 @@ df = dplyr::bind_rows(dfs)
 
 df = df %>%
   mutate(fold = seq(dplyr::n()),
-         fold = floor(fold / floor(dplyr::n()/n_folds) + 1))
+         fold = floor(fold / ceiling(dplyr::n()/n_folds) + 1))
 readr::write_rds(df, here::here("data", "raw", "all_filenames.rds"))
