@@ -2,6 +2,7 @@ library(rvest)
 library(curl)
 library(dplyr)
 library(here)
+n_folds = 50
 
 remove_double_space = function(x) {
   gsub("\\s+", " ", x)
@@ -81,3 +82,15 @@ get_version_filenames = function(nhanes_version) {
 
 get_version_filenames("pax_g")
 get_version_filenames("pax_h")
+
+dfs = lapply(c("pax_h", "pax_g"), function(version) {
+  readr::read_rds(
+    here::here("data", "raw", paste0(version, "_filenames.rds"))
+  )
+})
+df = dplyr::bind_rows(dfs)
+
+df = df %>%
+  mutate(fold = seq(dplyr::n()),
+         fold = floor(fold / floor(dplyr::n()/n_folds) + 1))
+readr::write_rds(df, here::here("data", "raw", "all_filenames.rds"))

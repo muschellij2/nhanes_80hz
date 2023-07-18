@@ -1,27 +1,19 @@
 library(magrittr)
 library(dplyr)
+fold = NULL
+rm(list = c("fold"))
 
-index = 1
-
-# process_index = function(index, cleanup = TRUE,
-#                          upload = TRUE) {
-
-stopifnot(length(index) == 1)
-dfs = lapply(c("pax_h", "pax_g"), function(version) {
-  readr::read_rds(
-    here::here("data", "raw", paste0(version, "_filenames.rds"))
-  )
-})
-df = dplyr::bind_rows(dfs)
+df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 xdf = df
-# reorder them so we can download some random
-# df = df[sample(nrow(df)),]
-df = df %>%
-  dplyr::filter(!file.exists(file))
 
-# max_n = min(1000, nrow(df))
+ifold = Sys.getenv("SGE_TASK_ID")
+ifold = as.numeric(ifold)
+if (!is.na(ifold)) {
+  df = df %>%
+    dplyr::filter(fold %in% ifold)
+}
+
 max_n = nrow(df)
-# for (index in seq(nrow(df))) {
 for (index in seq(max_n)) {
   print(index)
   idf = df[index,]

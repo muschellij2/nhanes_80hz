@@ -1,24 +1,19 @@
 library(magrittr)
 library(dplyr)
 source(here::here("code", "R", "helper_functions.R"))
-n_folds = 25
-index = 1
+fold = NULL
+rm(list = c("fold"))
 
-stopifnot(length(index) == 1)
-dfs = lapply(c("pax_h", "pax_g"), function(version) {
-  readr::read_rds(
-    here::here("data", "raw", paste0(version, "_filenames.rds"))
-  )
-})
-df = dplyr::bind_rows(dfs)
+df = readRDS(here::here("data", "raw", "all_filenames.rds"))
+xdf = df
+
 df = df[1:1000,]
-df = df %>%
-  mutate(fold = seq(dplyr::n()),
-         fold = floor(fold / floor(dplyr::n()/n_folds) + 1))
+
 ifold = Sys.getenv("SGE_TASK_ID")
 ifold = as.numeric(ifold)
-if (is.na(ifold)) {
-  ifold = 2
+if (!is.na(ifold)) {
+  df = df %>%
+    dplyr::filter(fold %in% ifold)
 }
 
 print(ifold)
