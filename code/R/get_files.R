@@ -28,6 +28,7 @@ for (index in seq(max_n)) {
   if (!file.exists(idf$file)) {
     dir.create(dirname(idf$file), showWarnings = FALSE,
                recursive = TRUE)
+    print(idf$file)
     curl::curl_download(idf$url, idf$file)
   }
 }
