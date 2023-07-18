@@ -289,22 +289,23 @@ tarball_to_csv = function(raw,
                           meta,
                           num_threads = 2,
                           ...) {
+  # print("Number of threads: ", num_threads)
   dir.create(dirname(csv), showWarnings = FALSE, recursive = TRUE)
   message("creating a df")
   df = tarball_df(raw = raw, logfile = logfile, meta = meta,
                   ...)
   message("writing csv")
   file = csv
-  if (have_pigz()) {
-    cmd = paste0(
-      "pigz -9 ",
-      ifelse(
-        !is.null(num_threads),
-        paste0("--processes ", num_threads),
-        ""),
-      " > ", csv)
-    file = pipe(cmd)
-  }
+  # if (have_pigz()) {
+  #   cmd = paste0(
+  #     "pigz -9 ",
+  #     ifelse(
+  #       !is.null(num_threads),
+  #       paste0("--processes ", num_threads),
+  #       ""),
+  #     " > ", csv)
+  #   file = pipe(cmd)
+  # }
   # need this because of return(x), no duplicate
   df = vroom::vroom_write(df, file = file, delim = ",",
                           num_threads = num_threads)
