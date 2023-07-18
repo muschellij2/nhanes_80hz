@@ -1,7 +1,7 @@
 library(magrittr)
 library(dplyr)
 source(here::here("code", "R", "helper_functions.R"))
-n_folds = 218
+n_folds = 25
 index = 1
 
 stopifnot(length(index) == 1)
