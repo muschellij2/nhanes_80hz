@@ -297,7 +297,7 @@ tarball_to_csv = function(raw,
   file = csv
   if (have_pigz()) {
     cmd = paste0(
-      "pigz -9",
+      "pigz -9 ",
       ifelse(
         !is.null(num_threads),
         paste0("--processes ", num_threads),
