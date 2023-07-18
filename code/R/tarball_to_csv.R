@@ -7,26 +7,20 @@ rm(list = c("fold"))
 df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 xdf = df
 
-df = df[1:1000,]
-
 ifold = Sys.getenv("SGE_TASK_ID")
 ifold = as.numeric(ifold)
+print(paste0("fold is: ", ifold))
 if (!is.na(ifold)) {
   df = df %>%
     dplyr::filter(fold %in% ifold)
 }
 
-print(ifold)
 xdf = df
 
 df = df %>%
-  dplyr::filter(fold %in% ifold)
-df = df %>%
   dplyr::filter(file.exists(file))
 
-# raw = df$file[1]
-
-max_n = min(1000, nrow(df))
+max_n = nrow(df)
 for (index in seq(max_n)) {
   # print(index)
   idf = df[index,]
