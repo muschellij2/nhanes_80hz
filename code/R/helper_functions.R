@@ -201,7 +201,7 @@ tarball_to_csv = function(tarball_file,
   # }
 
   print(head(df, 5))
-  stopifnot(!all(df$H))
+  stopifnot(!all(df$HEADER_TIMESTAMP %% 1 == 0))
   # need this because of return(x), no duplicate
   df = vroom::vroom_write(df, file = file, delim = ",",
                           num_threads = num_threads)
