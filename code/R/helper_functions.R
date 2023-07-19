@@ -250,7 +250,6 @@ tarball_df = function(
     raw,
     logfile,
     meta,
-    cleanup = TRUE,
     num_threads = 1,
     ...) {
   dir.create(dirname(logfile), showWarnings = FALSE, recursive = TRUE)
@@ -279,7 +278,6 @@ tarball_df = function(
   attr(df, "log_file") = logfile
   attr(df, "meta_df") = meta_df
   attr(df, "data_dir") = tdir
-  attr(df, "cleanup") = cleanup
 
   return(df)
 }
@@ -289,6 +287,7 @@ tarball_to_csv = function(raw,
                           logfile,
                           meta,
                           num_threads = 2,
+                          cleanup = TRUE,
                           ...) {
   # print("Number of threads: ", num_threads)
   dir.create(dirname(csv), showWarnings = FALSE, recursive = TRUE)
@@ -299,8 +298,7 @@ tarball_to_csv = function(raw,
                   num_threads = num_threads,
                   ...)
   data_dir = attr(df, "data_dir")
-  cleanup = attr(df, "cleanup")
-  if (!is.null(data_dir) && (!is.null(cleanup) && cleanup)) {
+  if (!is.null(data_dir) && cleanup) {
     on.exit(unlink(data_dir, recursive = TRUE), add = TRUE)
   }
   message("writing csv")
