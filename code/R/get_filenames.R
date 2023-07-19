@@ -18,8 +18,8 @@ read_html_newline = function(file) {
 }
 
 get_version_filenames = function(nhanes_version) {
-  filename = NULL
-  rm(list = c("filename"))
+  tarball_file = filename = NULL
+  rm(list = c("filename", "tarball_file"))
   data_dir = here::here("data", "raw")
   if (!dir.exists(data_dir)) {
     dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
@@ -55,26 +55,40 @@ get_version_filenames = function(nhanes_version) {
   df = do.call(rbind, df)
   colnames(df) = c("day_of_week", "month", "day", "year", "time", "am_pm",
                    "bytes", "filename")
-  df = as_tibble(df)
+  df = dplyr::as_tibble(df)
   df = df %>%
     dplyr::filter(tools::file_ext(filename) %in% "bz2")
 
   df = df %>%
-    mutate(
+    mutate(day = sub(",", "", day),
+           day = trimws(day))
+
+  make_csv_name = function(dir, nhanes_version, id) {
+    here::here("data", dir, nhanes_version, paste0(id, ".csv.gz"))
+  }
+  df = df %>%
+    dplyr::mutate(
       day_of_week = sub(",$", "", day_of_week),
       url = paste0(base_url, hrefs),
-      file = here::here("data", "raw", nhanes_version, filename),
+      tarball_file = here::here("data", "raw", nhanes_version, filename),
       # 2x because tar.bz2
       id = tools::file_path_sans_ext(filename),
-      id = tools::file_path_sans_ext(id),
-      parquet = here::here("data", "parquet", nhanes_version, paste0(id, ".parquet")),
-      meta =  here::here("data", "meta", nhanes_version, paste0(id, ".csv.gz")),
-      logfile =  here::here("data", "logs", nhanes_version, paste0(id, ".csv.gz")),
-      full_csv =  here::here("data", "csv", nhanes_version, paste0(id, ".csv.gz"))
-    ) %>%
-    select(id, url, file, filename, everything())
+      id = tools::file_path_sans_ext(id)
+    )
   df = df %>%
-    dplyr::mutate(version = nhanes_version)
+    dplyr::mutate(
+      parquet_file = make_csv_name("parquet", nhanes_version, id),
+      meta_file = make_csv_name("meta", nhanes_version, id),
+      summary_meta = make_csv_name("summary_meta", nhanes_version, id),
+      log_file = make_csv_name("logs", nhanes_version, id),
+      counts_file = make_csv_name("counts", nhanes_version, id),
+      measures_file = make_csv_name("measures", nhanes_version, id),
+      csv_file = make_csv_name("csv", nhanes_version, id)
+    )
+  df = df %>%
+    dplyr::mutate(version = nhanes_version) %>%
+    dplyr::select(version, id, url, tarball_file, filename,
+                  dplyr::everything())
   readr::write_rds(df, file.path(data_dir, paste0(nhanes_version, "_filenames.rds")))
 
   writeLines(df$id, file.path(data_dir, paste0(nhanes_version, "_ids.txt")))

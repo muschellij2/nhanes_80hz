@@ -14,13 +14,14 @@ if (!is.na(ifold)) {
 }
 
 max_n = nrow(df)
+index = 1
 for (index in seq(max_n)) {
   print(index)
   idf = df[index,]
-  if (!file.exists(idf$file)) {
-    dir.create(dirname(idf$file), showWarnings = FALSE,
+  if (!file.exists(idf$tarball_file)) {
+    dir.create(dirname(idf$tarball_file), showWarnings = FALSE,
                recursive = TRUE)
-    print(idf$file)
-    curl::curl_download(idf$url, idf$file)
+    print(idf$tarball_file)
+    curl::curl_download(idf$url, idf$tarball_file)
   }
 }

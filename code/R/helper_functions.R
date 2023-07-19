@@ -1,28 +1,8 @@
+options(digits.secs = 3)
+
 have_pigz = function() {
   pigz = Sys.which("pigz")
   !nzchar(pigz) || nchar(system("which pigz", intern = TRUE)) > 0
-}
-
-pigz = function(
-    filename,
-    overwrite = FALSE,
-    compression = 9
-) {
-
-  destname = paste0(filename, ".gz")
-  if (have_pigz()) {
-    if (file.exists(destname) && !overwrite) {
-      stop(destname, " already exists and overwrite = FALSE")
-    }
-    system(paste0("pigz -p 4 -f -v -", compression, " ", filename,
-                  " > ", destname))
-  } else {
-    R.utils::gzip(filename = filename,
-                  destname = destname,
-                  overwrite = overwrite,
-                  compression = compression)
-  }
-  return(destname)
 }
 
 col_types_80hz = vroom::cols(
@@ -76,45 +56,8 @@ write_data = function(data, file, format = "parquet") {
   stopifnot(length(x) == 1)
   ifile = sub(".gz$", "", file)
   fs::file_move(x, ifile)
-  if (format == "csv") {
-    pigz(ifile)
-  }
   # file.rename(x, normalizePath(file))
   return(file)
-}
-
-bucket_setup = function(bucket, project = NULL) {
-  if (is.null(project)) {
-    project = metagce::gce_project()
-  }
-  bucket_exists = function(bucket) {
-    out = try({
-      res = googleCloudStorageR::gcs_get_bucket(bucket = bucket)
-    }, silent = TRUE)
-    !inherits(out, "try-error") && !is.null(out)
-  }
-  # authorize the thing
-  if (!googleAuthR::gar_has_token()) {
-    token = trailrun:::auth_gce_token()
-  }
-  if (!bucket_exists(bucket)) {
-    trailrun::cr_gce_setup()
-    googleCloudStorageR::gcs_create_bucket(bucket, projectId = project)
-  }
-}
-
-get_wide_data = function() {
-  gcs = get_gcs_data()
-  wide = gcs %>%
-    filter(version %in% c("pax_h", "pax_g")) %>%
-    filter(grepl("[.](csv|tar)", file)) %>%
-    select(file, version, folder) %>%
-    mutate(id = basename(file),
-           id = sub("[.](gz|bz2)$", "", id),
-           id = sub("[.](csv|tar)", "", id))
-  wide = wide %>%
-    tidyr::spread(key = folder, value = file)
-  return(wide)
 }
 
 vroom_write_csv = function(..., num_threads = 2) {
@@ -127,24 +70,6 @@ make_folds = function(data, nfolds) {
   stopifnot(!anyNA(data$fold))
   return(data)
 }
-
-
-table_append = function(...) {
-  write_disposition = "WRITE_APPEND"
-  bigrquery::bq_table_upload(...,
-                             write_disposition = write_disposition)
-}
-push_table_up = function(bqt, df) {
-  df = as.data.frame(df)
-  if (!bigrquery::bq_table_exists(bqt)) {
-    message("Making Table")
-    bigrquery::bq_table_upload(x = bqt, values = df)
-  } else {
-    message("Making Table")
-    table_append(x = bqt, values = df)
-  }
-}
-
 
 check_time_diffs = function(time, sample_rate = 80) {
   dtime = as.numeric(diff(time, units = "secs"))
@@ -188,9 +113,6 @@ make_meta_df_from_files = function(files) {
 get_meta_df = function(raw) {
 
   dir.create(dirname(raw), recursive = TRUE, showWarnings = FALSE)
-  if (!file.exists(raw)) {
-    gcs_download(raw)
-  }
   files = untar(raw, list = TRUE, verbose = FALSE,
                 exdir = ".")
   df = make_meta_df_from_files(files)
@@ -199,110 +121,74 @@ get_meta_df = function(raw) {
   df
 }
 
-csv_collapse = function(files, outfile = NULL, id = NULL) {
-  files = normalizePath(files)
-  first_file = files[1]
-  if (is.null(outfile)) {
-    outfile = tempfile(fileext = ".csv")
-  }
-  hdr = readLines(first_file, n = 1)
-  hdr_file = tempfile(fileext = ".csv")
-  if (!is.null(id)) {
-    hdr = paste0("id,", hdr)
-  }
-  # print the header
-  cat(hdr, sep = "\n", file = hdr_file)
-  # add the data
-  data_file = tempfile(fileext = ".csv")
-  cmd = paste0("tail -q -n +2 ",
-               paste(files, collapse = " "),
-               " >> ", data_file)
-  res = system(cmd)
-  stopifnot(res == 0)
-  if (!is.null(id)) {
-    tfile = tempfile(fileext = ".csv")
-    cmd = paste0(
-      "awk '{ printf(",
-      paste0('"', id, ',%s\\n"'),
-      ", $0); }' ", data_file, " > ", tfile)
-    res = system(cmd)
-    stopifnot(res == 0)
-    file.remove(data_file)
-    data_file = tfile
-    rm(tfile)
-  }
-  cmd = paste0("cat ", hdr_file, " ", data_file, " > ", outfile)
-  res = system(cmd)
-  stopifnot(res == 0)
-  file.remove(data_file)
-  if (grepl("gz$", basename(outfile))) {
-    bfile = sub("[.]gz$", "", outfile)
-    file.rename(outfile, bfile)
-    cmd = paste0("gzip -9 ", bfile)
-    system(cmd)
-    stopifnot(res == 0)
-  }
-  stopifnot(file.exists(outfile))
-  return(outfile)
-}
-
 tarball_df = function(
-    raw,
-    logfile,
-    meta,
+    tarball_file,
+    log_file,
+    meta_file,
     num_threads = 1,
     ...) {
-  dir.create(dirname(logfile), showWarnings = FALSE, recursive = TRUE)
-  dir.create(dirname(meta), showWarnings = FALSE, recursive = TRUE)
+  ds = getOption("digits.secs")
+  on.exit({
+    options(digits.secs = ds)
+  }, add = TRUE)
+  options(digits.secs = 3)
+  dir.create(dirname(log_file), showWarnings = FALSE, recursive = TRUE)
+  dir.create(dirname(meta_file), showWarnings = FALSE, recursive = TRUE)
   tdir = tempfile()
 
   dir.create(tdir, showWarnings = TRUE)
-  exit_code = untar(tarfile = raw, exdir = tdir, verbose = TRUE)
+  exit_code = untar(tarfile = tarball_file, exdir = tdir, verbose = TRUE)
   stopifnot(exit_code == 0)
 
   files = list.files(path = tdir, full.names = FALSE, recursive = TRUE)
   meta_df = make_meta_df_from_files(files)
-  readr::write_csv(meta_df, file = meta)
+  readr::write_csv(meta_df, file = meta_file)
 
   files = list.files(path = tdir, full.names = TRUE)
   included_log_file = files[grepl("_log", files, ignore.case = TRUE)]
   stopifnot(length(included_log_file) <= 1)
   if (length(included_log_file) == 1) {
-    R.utils::gzip(included_log_file, destname = logfile,
+    R.utils::gzip(included_log_file, destname = log_file,
                   remove = FALSE, overwrite = TRUE,
                   compression = 9)
   }
   csv_files = files[!grepl("_log", files, ignore.case = TRUE)]
   df = vroom::vroom(csv_files, num_threads = num_threads,
                     col_types = col_types_80hz)
-  attr(df, "log_file") = logfile
+  attr(df, "log_file") = log_file
   attr(df, "meta_df") = meta_df
   attr(df, "data_dir") = tdir
 
   return(df)
 }
 
-tarball_to_csv = function(raw,
-                          csv,
-                          logfile,
-                          meta,
+tarball_to_csv = function(tarball_file,
+                          csv_file,
+                          log_file,
+                          meta_file,
                           num_threads = 2,
                           cleanup = TRUE,
                           ...) {
+  ds = getOption("digits.secs")
+  on.exit({
+    options(digits.secs = ds)
+  }, add = TRUE)
+  options(digits.secs = 3)
+
   # print("Number of threads: ", num_threads)
-  dir.create(dirname(csv), showWarnings = FALSE, recursive = TRUE)
+  dir.create(dirname(csv_file), showWarnings = FALSE, recursive = TRUE)
   message("creating a df")
-  df = tarball_df(raw = raw,
-                  logfile = logfile,
-                  meta = meta,
+  df = tarball_df(tarball_file = tarball_file,
+                  log_file = log_file,
+                  meta_file = meta_file,
                   num_threads = num_threads,
                   ...)
   data_dir = attr(df, "data_dir")
   if (!is.null(data_dir) && cleanup) {
     on.exit(unlink(data_dir, recursive = TRUE), add = TRUE)
   }
-  message("writing csv")
-  file = csv
+  message(paste0("writing csv: ", csv_file))
+  file = csv_file
   # if (have_pigz()) {
   #   cmd = paste0(
   #     "pigz -9 ",
@@ -313,39 +199,15 @@ tarball_to_csv = function(raw,
   #     " > ", csv)
   #   file = pipe(cmd)
   # }
+
+  print(head(df, 5))
+  stopifnot(!all(df$H))
   # need this because of return(x), no duplicate
   df = vroom::vroom_write(df, file = file, delim = ",",
                           num_threads = num_threads)
   message("CSV written")
 
   for (i in 1:3) gc()
-  return(df)
-}
-
-id_tarball_to_csv = function(id, version, file, cleanup = TRUE) {
-  message("downloading tarball")
-  tarball = download_80hz(id, version)
-  gc()
-  df = tarball_to_csv(tarball, file, cleanup = cleanup)
-  if (cleanup) {
-    file.remove(tarball)
-  }
-  df
-}
-
-id_tarball_to_csv_fix = function(id, version, file, cleanup = TRUE) {
-  df = id_tarball_to_csv(id, version, file, cleanup = cleanup)
-  stopifnot(nrow(df) > 0)
-  log_file = attr(df, "log_file")
-  gcs_upload_file(file)
-  file.remove(file)
-  if (!is.null(log_file) && file.exists(log_file)) {
-    fname = paste0(version, "/", "logs", "/", id, ".csv.gz")
-    file.copy(log_file, fname, overwrite = TRUE)
-    gcs_upload_file(fname)
-  }
-  for (i in 1:3) gc()
-  attr(df, "log_file") = NULL
   return(df)
 }
 
@@ -460,18 +322,6 @@ header_to_day = function(df) {
 }
 
 
-in_bqt = function(bqt, id) {
-  if (bigrquery::bq_table_exists(bqt)) {
-    xx = tbl(bqt)
-    xx = xx %>%
-      count(id) %>%
-      collect()
-    return(id %in% xx$id)
-  } else {
-    return(FALSE)
-  }
-}
-
 
 process_nhanes_80hz = function(id, version,
                                sample_rate = 80L,
@@ -575,12 +425,6 @@ process_nhanes_80hz = function(id, version,
   )
 }
 
-gcs_file_exists = function(x) {
-  res = try({
-    googleCloudStorageR::gcs_get_object(x, meta = TRUE)
-  }, silent = TRUE)
-  !inherits(res, "try-error")
-}
 
 
 
@@ -714,3 +558,115 @@ make_flag_df = function(id, version, ...) {
   return(flags)
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+summarise_nhanes_80hz = function(
+    csv_file,
+    log_file,
+    meta_file,
+    counts_file,
+    measures_file,
+    sample_rate = 80L,
+    dynamic_range = c(-6L, 6L),
+    verbose = TRUE
+) {
+
+  id = basename(csv_file)
+  id = sub(".csv.*", "", id)
+  files = c(csv_file, counts_file, measures_file, meta_file, log_file)
+  sapply(files, function(x) {
+    dir.create(dirname(x), showWarnings = FALSE, recursive = TRUE)
+  })
+
+  df = read_80hz(csv_file)
+
+  id_meta_df = readr::read_csv(meta_file)
+  meta_df = summarize_meta_df(id_meta_df, raw = NULL)
+  rtime = range(df$HEADER_TIMESTAMP, na.rm = TRUE)
+  meta_df$start_time = as.character(rtime[1])
+  meta_df$stop_time = as.character(rtime[2])
+  meta_df$id = id
+  meta_df = meta_df %>%
+    dplyr::select(id, dplyr::everything())
+
+  # run quick checks
+  # Add to database!!!
+  stopifnot(
+    lubridate::is.POSIXct(df$HEADER_TIMESTAMP)
+  )
+
+  check_time_diffs(df$HEADER_TIMESTAMP, sample_rate = sample_rate)
+
+  run_time = system.time({
+    measures = SummarizedActigraphy::calculate_measures(
+      df,
+      calculate_ac = FALSE,
+      fix_zeros = FALSE,
+      fill_in = FALSE,
+      trim = FALSE,
+      dynamic_range = dynamic_range,
+      calculate_mims = FALSE,
+      flag_data = FALSE,
+      sample_rate = sample_rate,
+      verbose = verbose > 0)
+  })
+  measures = tibble::as_tibble(measures)
+  if (!"HEADER_TIMESTAMP" %in% colnames(measures)) {
+    measures = measures %>%
+      dplyr::rename(HEADER_TIMESTAMP = time)
+  }
+  measures$id = id
+  measures = measures %>%
+    dplyr::select(id, everything())
+
+  readr::write_csv(measures, measures_file, num_threads = 1)
+
+  rm(df)
+  for (i in 1:10) gc()
+
+  # From muschellij2/agcounts-1
+  counts = agcounts::convert_counts_csv(
+    file,
+    outfile = counts_file,
+    sample_rate = sample_rate,
+    epoch_in_seconds = 60L,
+    verbose = 2,
+    time_column = "HEADER_TIMESTAMP")
+
+  counts$id = id
+  counts = counts %>%
+    dplyr::select(id, everything()) %>%
+    rename(AC_X = X, AC_Y = Y, AC_Z = Z)
+  counts = as.data.frame(counts)
+
+  readr::write_csv(counts, counts_file, num_threads = 1)
+
+  list(
+    csv_file = csv_file,
+    measures = measures,
+    counts = counts,
+    id_meta_df = id_meta_df,
+    meta_df = meta_df,
+    counts_file = counts_file,
+    measures_file = measures_file,
+    meta_file = meta_file,
+    log_file = log_file
+  )
+}
+
