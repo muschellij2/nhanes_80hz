@@ -323,107 +323,107 @@ header_to_day = function(df) {
 
 
 
-process_nhanes_80hz = function(id, version,
-                               sample_rate = 80L,
-                               dynamic_range = c(-6L, 6L),
-                               verbose = TRUE
-) {
-  stopifnot(length(id) == 1)
-  stopifnot(length(version) == 1)
-  file = file.path(version, "csv", paste0(id, ".csv.gz"))
-  counts_file = file.path(version, "counts", paste0(id, ".csv.gz"))
-  measures_file = file.path(version, "summary", paste0(id, ".csv.gz"))
-  meta_file = file.path(version, "meta", paste0(id, ".csv.gz"))
-  log_file = file.path(version, "logs", paste0(id, ".csv.gz"))
-  files = c(file, counts_file, measures_file, meta_file, log_file)
-  sapply(files, function(x) {
-    dir.create(dirname(x), showWarnings = FALSE, recursive = TRUE)
-  })
-
-  message("downloading tarball")
-  tarball = download_80hz(id, version, quiet = verbose < 2)
-  # this runs checks on firmware and diff time of 60 mins
-  message("Making tarball df")
-  df = tarball_df(tarball, cleanup = TRUE, num_threads = 1,
-                  outfile = file)
-  tmp_log_file = attr(df, "log_file")
-  file.copy(tmp_log_file, log_file, overwrite = TRUE)
-
-  id_meta_df = attr(df, "meta_df")
-  meta_df = summarize_meta_df(id_meta_df, raw = NULL)
-  meta_df$start_time = as.character(min(df$HEADER_TIMESTAMP))
-  meta_df$stop_time = as.character(max(df$HEADER_TIMESTAMP))
-  meta_df$id = id
-  meta_df = meta_df %>%
-    dplyr::select(id, dplyr::everything())
-
-  readr::write_csv(meta_df, meta_file)
-
-  # run quick checks
-  # Add to database!!!
-  stopifnot(
-    lubridate::is.POSIXct(df$HEADER_TIMESTAMP)
-  )
-
-  check_time_diffs(df$HEADER_TIMESTAMP, sample_rate = sample_rate)
-
-  run_time = system.time({
-    measures = SummarizedActigraphy::calculate_measures(
-      df,
-      calculate_ac = FALSE,
-      fix_zeros = FALSE,
-      fill_in = FALSE,
-      trim = FALSE,
-      dynamic_range = dynamic_range,
-      calculate_mims = FALSE,
-      flag_data = FALSE,
-      sample_rate = sample_rate,
-      verbose = verbose > 0)
-  })
-  measures = tibble::as_tibble(measures)
-  if (!"HEADER_TIMESTAMP" %in% colnames(measures)) {
-    measures = measures %>%
-      dplyr::rename(HEADER_TIMESTAMP = time)
-  }
-  measures$id = id
-  measures = measures %>%
-    select(id, everything())
-
-  readr::write_csv(measures, measures_file, num_threads = 1)
-
-  rm(df)
-  for (i in 1:10) gc()
-
-  counts = agcounts::convert_counts_csv(
-    file,
-    outfile = counts_file,
-    sample_rate = sample_rate,
-    epoch_in_seconds = 60L,
-    verbose = 2,
-    time_column = "HEADER_TIMESTAMP")
-
-  counts$id = id
-  counts = counts %>%
-    dplyr::select(id, everything()) %>%
-    rename(AC_X = X, AC_Y = Y, AC_Z = Z)
-  counts = as.data.frame(counts)
-
-  readr::write_csv(counts, counts_file, num_threads = 1)
-
-  # unlink(dirname(tmp_log_file), recursive = TRUE)
-  file.remove(tarball)
-  list(
-    csv_file = file,
-    measures = measures,
-    counts = counts,
-    id_meta_df = id_meta_df,
-    meta_df = meta_df,
-    counts_file = counts_file,
-    measures_file = measures_file,
-    meta_file = meta_file,
-    log_file = log_file
-  )
-}
+# process_nhanes_80hz = function(id, version,
+#                                sample_rate = 80L,
+#                                dynamic_range = c(-6L, 6L),
+#                                verbose = TRUE
+# ) {
+#   stopifnot(length(id) == 1)
+#   stopifnot(length(version) == 1)
+#   file = file.path(version, "csv", paste0(id, ".csv.gz"))
+#   counts_file = file.path(version, "counts", paste0(id, ".csv.gz"))
+#   measures_file = file.path(version, "summary", paste0(id, ".csv.gz"))
+#   meta_file = file.path(version, "meta", paste0(id, ".csv.gz"))
+#   log_file = file.path(version, "logs", paste0(id, ".csv.gz"))
+#   files = c(file, counts_file, measures_file, meta_file, log_file)
+#   sapply(files, function(x) {
+#     dir.create(dirname(x), showWarnings = FALSE, recursive = TRUE)
+#   })
+#
+#   message("downloading tarball")
+#   tarball = download_80hz(id, version, quiet = verbose < 2)
+#   # this runs checks on firmware and diff time of 60 mins
+#   message("Making tarball df")
+#   df = tarball_df(tarball, cleanup = TRUE, num_threads = 1,
+#                   outfile = file)
+#   tmp_log_file = attr(df, "log_file")
+#   file.copy(tmp_log_file, log_file, overwrite = TRUE)
+#
+#   id_meta_df = attr(df, "meta_df")
+#   meta_df = summarize_meta_df(id_meta_df, raw = NULL)
+#   meta_df$start_time = as.character(min(df$HEADER_TIMESTAMP))
+#   meta_df$stop_time = as.character(max(df$HEADER_TIMESTAMP))
+#   meta_df$id = id
+#   meta_df = meta_df %>%
+#     dplyr::select(id, dplyr::everything())
+#
+#   readr::write_csv(meta_df, meta_file)
+#
+#   # run quick checks
+#   # Add to database!!!
+#   stopifnot(
+#     lubridate::is.POSIXct(df$HEADER_TIMESTAMP)
+#   )
+#
+#   check_time_diffs(df$HEADER_TIMESTAMP, sample_rate = sample_rate)
+#
+#   run_time = system.time({
+#     measures = SummarizedActigraphy::calculate_measures(
+#       df,
+#       calculate_ac = FALSE,
+#       fix_zeros = FALSE,
+#       fill_in = FALSE,
+#       trim = FALSE,
+#       dynamic_range = dynamic_range,
+#       calculate_mims = FALSE,
+#       flag_data = FALSE,
+#       sample_rate = sample_rate,
+#       verbose = verbose > 0)
+#   })
+#   measures = tibble::as_tibble(measures)
+#   if (!"HEADER_TIMESTAMP" %in% colnames(measures)) {
+#     measures = measures %>%
+#       dplyr::rename(HEADER_TIMESTAMP = time)
+#   }
+#   measures$id = id
+#   measures = measures %>%
+#     dplyr::select(id, dplyr::everything())
+#
+#   readr::write_csv(measures, measures_file, num_threads = 1)
+#
+#   rm(df)
+#   for (i in 1:10) gc()
+#
+#   counts = agcounts::convert_counts_csv(
+#     file,
+#     outfile = counts_file,
+#     sample_rate = sample_rate,
+#     epoch_in_seconds = 60L,
+#     verbose = 2,
+#     time_column = "HEADER_TIMESTAMP")
+#
+#   counts$id = id
+#   counts = counts %>%
+#     dplyr::select(id, everything()) %>%
+#     rename(AC_X = X, AC_Y = Y, AC_Z = Z)
+#   counts = as.data.frame(counts)
+#
+#   readr::write_csv(counts, counts_file, num_threads = 1)
+#
+#   # unlink(dirname(tmp_log_file), recursive = TRUE)
+#   file.remove(tarball)
+#   list(
+#     csv_file = file,
+#     measures = measures,
+#     counts = counts,
+#     id_meta_df = id_meta_df,
+#     meta_df = meta_df,
+#     counts_file = counts_file,
+#     measures_file = measures_file,
+#     meta_file = meta_file,
+#     log_file = log_file
+#   )
+# }
 
 
 
@@ -594,7 +594,14 @@ summarise_nhanes_80hz = function(
     dir.create(dirname(x), showWarnings = FALSE, recursive = TRUE)
   })
 
+  ds = getOption("digits.secs")
+  on.exit({
+    options(digits.secs = ds)
+  }, add = TRUE)
+  options(digits.secs = 3)
+
   df = read_80hz(csv_file)
+  print(head(df))
 
   id_meta_df = readr::read_csv(meta_file)
   meta_df = summarize_meta_df(id_meta_df, raw = NULL)
@@ -642,7 +649,7 @@ summarise_nhanes_80hz = function(
 
   # From muschellij2/agcounts-1
   counts = agcounts::convert_counts_csv(
-    file,
+    csv_file,
     outfile = counts_file,
     sample_rate = sample_rate,
     epoch_in_seconds = 60L,

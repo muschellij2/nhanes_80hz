@@ -2,7 +2,11 @@
 library(dplyr)
 library(tidyr)
 library(agcounts)
+library(SummarizedActigraphy)
 options(digits.secs = 3)
+if (Sys.info()[["user"]] == "johnmuschelli") {
+  reticulate::use_python("/Users/johnmuschelli/miniconda3/bin/python3")
+}
 suppressPackageStartupMessages(library("optparse"))
 source(here::here("code", "R", "helper_functions.R"))
 fold = NULL
@@ -19,9 +23,6 @@ if (!is.na(ifold)) {
     dplyr::filter(fold %in% ifold)
 }
 
-df = df %>%
-  dplyr::filter(file.exists(tarball_file))
-
 
 
 
@@ -32,10 +33,9 @@ index = 1
 for (index in seq(max_n)) {
   # print(index)
   idf = df[index,]
-  print(idf$tarball_file)
+  print(idf$csv_file)
 
   files = list(
-    tarball_file = idf$tarball_file,
     csv_file = idf$csv_file,
     log_file = idf$log_file,
     meta_file = idf$meta_file,
