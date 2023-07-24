@@ -211,7 +211,8 @@ tarball_to_csv = function(tarball_file,
   return(df)
 }
 
-summarize_meta_df = function(df, raw = NULL) {
+summarize_meta_df = function(df, raw = NULL,
+                             num_threads = 1L) {
 
   # adding zero so they are the same length for which later
   stopifnot(all(df$dtime <= 60))
@@ -242,7 +243,8 @@ summarize_meta_df = function(df, raw = NULL) {
       options(digits.secs = ds)
     }, add = TRUE)
     options(digits.secs = 3)
-    dates = lapply(file.path(tdir, extract_files), readr::read_csv)
+    dates = lapply(file.path(tdir, extract_files), readr::read_csv,
+                   num_threads = num_threads)
     dates = lapply(dates, function(x) range(x$HEADER_TIMESTAMP))
     dates = unlist(dates)
     dates = as.POSIXct(dates, origin = lubridate::origin)
@@ -587,6 +589,7 @@ summarise_nhanes_80hz = function(
     measures_file,
     sample_rate = 80L,
     dynamic_range = c(-6L, 6L),
+    num_threads = 1L,
     verbose = TRUE
 ) {
 
@@ -603,10 +606,10 @@ summarise_nhanes_80hz = function(
   }, add = TRUE)
   options(digits.secs = 3)
 
-  df = read_80hz(csv_file)
+  df = read_80hz(csv_file, num_threads = num_threads)
   print(head(df))
 
-  id_meta_df = readr::read_csv(meta_file)
+  id_meta_df = readr::read_csv(meta_file, num_threads = num_threads)
   meta_df = summarize_meta_df(id_meta_df, raw = NULL)
   rtime = range(df$HEADER_TIMESTAMP, na.rm = TRUE)
   meta_df$start_time = as.character(rtime[1])
