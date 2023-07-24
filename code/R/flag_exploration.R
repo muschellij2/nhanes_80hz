@@ -1,7 +1,9 @@
 library(dplyr)
-logs = list.files(path = "pax_h/logs", pattern = ".csv", full.names = TRUE)
+library(readr)
+source("code/R/helper_functions.R")
+logs = list.files(path = "data/logs/pax_h", pattern = ".csv", full.names = TRUE)
 res = file.info(logs)
-res = res[res$size > 1000,]
+# res = res[res$size > 1000,]
 logs = rownames(res)
 df = lapply(logs, function(log_file) {
   id = sub("[.]csv.*", "", basename(log_file))

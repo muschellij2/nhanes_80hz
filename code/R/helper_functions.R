@@ -287,10 +287,13 @@ meta_df = function(raw, curr_ids = NULL) {
 }
 
 
-read_80hz = function(file, ...) {
+read_80hz = function(file, num_threads = 1, ...) {
 
   message("Reading in Full data")
-  dat = vroom::vroom(file, col_types = col_types_80hz, ...)
+  dat = vroom::vroom(file,
+                     col_types = col_types_80hz,
+                     num_threads = num_threads,
+                     ...)
 }
 
 col_time_with_frac_secs = function(...) {
