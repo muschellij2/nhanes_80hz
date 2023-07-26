@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 library(dplyr)
 library(tidyr)
-library(agcounts)
+library(agcounter)
 library(SummarizedActigraphy)
 options(digits.secs = 3)
 if (Sys.info()[["user"]] == "johnmuschelli") {

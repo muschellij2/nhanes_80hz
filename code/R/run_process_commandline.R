@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 library(dplyr)
 library(tidyr)
-library(agcounts)
+library(agcounter)
 suppressPackageStartupMessages(library("optparse"))
 source("helper_functions.R")
 Sys.unsetenv("RETICULATE_PYTHON")

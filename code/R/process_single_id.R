@@ -1,6 +1,6 @@
 library(dplyr)
 library(tidyr)
-library(agcounts)
+library(agcounter)
 source("helper_functions.R")
 options(digits.secs = 3)
 bucket = "nhanes_80hz"

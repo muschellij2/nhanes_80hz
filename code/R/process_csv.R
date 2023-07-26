@@ -133,7 +133,7 @@ process_csv = function(id, measure_1min_bqt) {
       file.remove(file.path(tempdir(), basename(csv_file)))
       # message("Running AGCounts")
       # for (i in 1:3) gc()
-      # res = agcounts::get_counts_csv(
+      # res = agcounter::get_counts_csv(
       #   csv_file,
       #   sample_rate = 80L,
       #   epoch_in_seconds = 60L,

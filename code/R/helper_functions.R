@@ -399,7 +399,7 @@ header_to_day = function(df) {
 #   rm(df)
 #   for (i in 1:10) gc()
 #
-#   counts = agcounts::convert_counts_csv(
+#   counts = agcounter::convert_counts_csv(
 #     file,
 #     outfile = counts_file,
 #     sample_rate = sample_rate,
@@ -653,8 +653,8 @@ summarise_nhanes_80hz = function(
   rm(df)
   for (i in 1:10) gc()
 
-  # From muschellij2/agcounts-1
-  counts = agcounts::convert_counts_csv(
+  # From muschellij2/agcounter
+  counts = agcounter::convert_counts_csv(
     csv_file,
     outfile = counts_file,
     sample_rate = sample_rate,
