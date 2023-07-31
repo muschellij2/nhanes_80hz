@@ -121,7 +121,6 @@ demog = tibble::tribble(
 )
 demog = demog %>%
   dplyr::mutate(
-    filename = basename(url),
     outdir = here::here("data", "raw"),
     xpt_file = file.path(outdir, filename),
     demog_file = file.path(outdir, paste0(version, "_demographics.csv.gz"))
