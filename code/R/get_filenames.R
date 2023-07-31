@@ -111,3 +111,28 @@ df = df %>%
   mutate(fold = seq(dplyr::n()),
          fold = floor(fold / ceiling(dplyr::n()/n_folds) + 1))
 readr::write_rds(df, here::here("data", "raw", "all_filenames.rds"))
+
+
+demog = tibble::tribble(
+  ~ version, ~ url,
+  "pax_h", "https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/DEMO_H.XPT",
+  "pax_g", "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/DEMO_G.XPT",
+  "pax_y", "https://wwwn.cdc.gov/Nchs/Nnyfs/Y_DEMO.XPT")
+demog = demog %>%
+  dplyr::mutate(
+    filename = basename(url),
+    outdir = here::here("data", "raw", version),
+    xpt_file = file.path(outdir, filename),
+    demog_file = file.path(outdir, "demographics.csv.gz")
+  )
+for (i in seq(nrow(demog))) {
+  idf = demog[i,]
+  if (!file.exists(idf$xpt_file)) {
+    data_dir = dirname(idf$xpt_file)
+    if (!dir.exists(data_dir)) {
+      dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
+    }
+    curl::curl_download(idf$url, destfile = idf$xpt_file)
+  }
+}
+
