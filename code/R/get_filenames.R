@@ -98,8 +98,9 @@ get_version_filenames = function(nhanes_version) {
 
 get_version_filenames("pax_g")
 get_version_filenames("pax_h")
+get_version_filenames("pax_y")
 
-dfs = lapply(c("pax_h", "pax_g"), function(version) {
+dfs = lapply(c("pax_h", "pax_g", "pax_y"), function(version) {
   readr::read_rds(
     here::here("data", "raw", paste0(version, "_filenames.rds"))
   )

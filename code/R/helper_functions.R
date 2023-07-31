@@ -409,7 +409,7 @@ header_to_day = function(df) {
 #
 #   counts$id = id
 #   counts = counts %>%
-#     dplyr::select(id, everything()) %>%
+#     dplyr::select(id, dplyr::everything()) %>%
 #     rename(AC_X = X, AC_Y = Y, AC_Z = Z)
 #   counts = as.data.frame(counts)
 #
@@ -587,12 +587,14 @@ summarise_nhanes_80hz = function(
     meta_file,
     counts_file,
     measures_file,
+    summary_meta_file = NULL,
     sample_rate = 80L,
     dynamic_range = c(-6L, 6L),
     num_threads = 1L,
     verbose = TRUE
 ) {
-
+  X = Y = Z = NULL
+  rm(list = c("X", "Y", "Z"))
   id = basename(csv_file)
   id = sub(".csv.*", "", id)
   files = c(csv_file, counts_file, measures_file, meta_file, log_file)
@@ -646,7 +648,7 @@ summarise_nhanes_80hz = function(
   }
   measures$id = id
   measures = measures %>%
-    dplyr::select(id, everything())
+    dplyr::select(id, dplyr::everything())
 
   readr::write_csv(measures, measures_file, num_threads = 1)
 
@@ -664,8 +666,8 @@ summarise_nhanes_80hz = function(
 
   counts$id = id
   counts = counts %>%
-    dplyr::select(id, everything()) %>%
-    rename(AC_X = X, AC_Y = Y, AC_Z = Z)
+    dplyr::select(id, dplyr::everything()) %>%
+    dplyr::rename(AC_X = X, AC_Y = Y, AC_Z = Z)
   counts = as.data.frame(counts)
 
   readr::write_csv(counts, counts_file, num_threads = 1)

@@ -16,3 +16,6 @@ __pycache__/
 blah.py
 .ipynb_checkpoints
 data
+find_walking.m
+MatlabServer.m
+code/scratch
