@@ -114,16 +114,17 @@ readr::write_rds(df, here::here("data", "raw", "all_filenames.rds"))
 
 
 demog = tibble::tribble(
-  ~ version, ~ url,
-  "pax_h", "https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/DEMO_H.XPT",
-  "pax_g", "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/DEMO_G.XPT",
-  "pax_y", "https://wwwn.cdc.gov/Nchs/Nnyfs/Y_DEMO.XPT")
+  ~ version, ~ url, ~ filename,
+  "pax_h", "https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/DEMO_H.XPT", "DEMO_H.XPT",
+  "pax_g", "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/DEMO_G.XPT", "DEMO_G.XPT",
+  "pax_y", "https://wwwn.cdc.gov/Nchs/Nnyfs/Y_DEMO.XPT", "DEMO_Y.XPT"
+)
 demog = demog %>%
   dplyr::mutate(
     filename = basename(url),
-    outdir = here::here("data", "raw", version),
+    outdir = here::here("data", "raw"),
     xpt_file = file.path(outdir, filename),
-    demog_file = file.path(outdir, "demographics.csv.gz")
+    demog_file = file.path(outdir, paste0(version, "_demographics.csv.gz"))
   )
 for (i in seq(nrow(demog))) {
   idf = demog[i,]
