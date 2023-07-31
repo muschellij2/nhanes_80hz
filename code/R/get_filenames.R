@@ -2,7 +2,7 @@ library(rvest)
 library(curl)
 library(dplyr)
 library(here)
-n_folds = 50
+n_folds = 55
 
 remove_double_space = function(x) {
   gsub("\\s+", " ", x)
