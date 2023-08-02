@@ -29,7 +29,7 @@ index = 1
 for (index in seq(max_n)) {
   # print(index)
   idf = df[index,]
-  print(paste(index, " of ", max_n))
+  print(paste0(index, " of ", max_n))
   print(idf$csv_file)
 
   files = list(
