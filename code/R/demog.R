@@ -1,15 +1,13 @@
 library(haven)
 library(dplyr)
 library(nhanesA)
+source("code/R/utils.R")
 table = "DEMO_G"
 
-read_and_relabel = function(table) {
+read_and_relabel = function(table, ...) {
   file = here::here("data", "raw", paste0(table, ".XPT"))
-  df = haven::read_xpt(file)
-  nh_table = table
-  if (table == "DEMO_Y") {
-    nh_table = "Y_DEMO"
-  }
+  df = haven::read_xpt(file, ...)
+  nh_table = normalize_table_name(table)
   df = nhanesA::nhanesTranslate(nh_table = nh_table, data = df,
                                 colnames = colnames(df))
   cn = colnames(df)
@@ -23,7 +21,8 @@ read_and_relabel = function(table) {
   df = df %>%
     dplyr::mutate(
       nh_table = table,
-      wave = sub("demo_", "", tolower(nh_table)),
+      table = normalize_table_name(nh_table),
+      wave = sub(".*_(.*)", "\\1", tolower(table)),
       version = paste0("pax_", wave)
     )
   df

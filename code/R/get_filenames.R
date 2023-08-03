@@ -2,6 +2,7 @@ library(rvest)
 library(curl)
 library(dplyr)
 library(here)
+source("code/R/utils.R")
 n_folds = 55
 
 remove_double_space = function(x) {
@@ -20,11 +21,18 @@ read_html_newline = function(file) {
 get_version_filenames = function(nhanes_version) {
   tarball_file = filename = NULL
   rm(list = c("filename", "tarball_file"))
-  data_dir = here::here("data", "raw")
+  nhanes_version = tolower(nhanes_version)
+  table = tolower(normalize_table_name(nhanes_version))
+  suffix = ifelse(grepl("paxlux", nhanes_version), "_lux",
+                  "")
+  data_dir = here::here(
+    "data",
+    paste0("raw", suffix)
+  )
   if (!dir.exists(data_dir)) {
     dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
   }
-  file = file.path(data_dir, paste0(nhanes_version, "_index.html"))
+  file = file.path(data_dir, paste0(table, "_index.html"))
   base_url = "https://ftp.cdc.gov"
   url = paste0(base_url, "/pub/", nhanes_version, "/")
   if (!file.exists(file)) {
@@ -63,35 +71,43 @@ get_version_filenames = function(nhanes_version) {
     mutate(day = sub(",", "", day),
            day = trimws(day))
 
-  make_csv_name = function(dir, nhanes_version, id) {
-    here::here("data", dir, nhanes_version, paste0(id, ".csv.gz"))
+  folder_name = paste0("pax_", sub(".*_(.*)", "\\1", table))
+
+  make_csv_name = function(dir, folder_name, id) {
+    here::here("data", dir, folder_name, paste0(id, ".csv.gz"))
   }
   df = df %>%
     dplyr::mutate(
       day_of_week = sub(",$", "", day_of_week),
       url = paste0(base_url, hrefs),
-      tarball_file = here::here("data", "raw", nhanes_version, filename),
+      tarball_file = here::here("data",
+                                paste0("raw", suffix),
+                                folder_name, filename),
       # 2x because tar.bz2
       id = tools::file_path_sans_ext(filename),
       id = tools::file_path_sans_ext(id)
     )
   df = df %>%
     dplyr::mutate(
-      parquet_file = make_csv_name("parquet", nhanes_version, id),
-      meta_file = make_csv_name("meta", nhanes_version, id),
-      summary_meta = make_csv_name("summary_meta", nhanes_version, id),
-      log_file = make_csv_name("logs", nhanes_version, id),
-      counts_file = make_csv_name("counts", nhanes_version, id),
-      measures_file = make_csv_name("measures", nhanes_version, id),
-      csv_file = make_csv_name("csv", nhanes_version, id)
+      meta_file = make_csv_name(paste0("meta", suffix),
+                                folder_name, id),
+      summary_meta = make_csv_name(paste0("summary_meta", suffix),
+                                   folder_name, id),
+      log_file = make_csv_name(paste0("logs", suffix),
+                               folder_name, id),
+      csv_file = make_csv_name(paste0("csv", suffix),
+                               folder_name, id)
     )
   df = df %>%
-    dplyr::mutate(version = nhanes_version) %>%
+    dplyr::mutate(version = folder_name) %>%
     dplyr::select(version, id, url, tarball_file, filename,
                   dplyr::everything())
-  readr::write_rds(df, file.path(data_dir, paste0(nhanes_version, "_filenames.rds")))
+  readr::write_rds(df, file.path(data_dir,
+                                 paste0(folder_name, suffix,
+                                        "_filenames.rds")))
 
-  writeLines(df$id, file.path(data_dir, paste0(nhanes_version, "_ids.txt")))
+  writeLines(df$id, file.path(data_dir, paste0(folder_name, suffix,
+                                               "_ids.txt")))
   return(df)
 }
 
@@ -99,6 +115,8 @@ get_version_filenames = function(nhanes_version) {
 get_version_filenames("pax_g")
 get_version_filenames("pax_h")
 get_version_filenames("pax_y")
+
+get_version_filenames("y_paxlux")
 
 dfs = lapply(c("pax_h", "pax_g", "pax_y"), function(version) {
   readr::read_rds(
@@ -113,26 +131,5 @@ df = df %>%
 readr::write_rds(df, here::here("data", "raw", "all_filenames.rds"))
 
 
-demog = tibble::tribble(
-  ~ version, ~ url, ~ filename,
-  "pax_h", "https://wwwn.cdc.gov/Nchs/Nhanes/2013-2014/DEMO_H.XPT", "DEMO_H.XPT",
-  "pax_g", "https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/DEMO_G.XPT", "DEMO_G.XPT",
-  "pax_y", "https://wwwn.cdc.gov/Nchs/Nnyfs/Y_DEMO.XPT", "DEMO_Y.XPT"
-)
-demog = demog %>%
-  dplyr::mutate(
-    outdir = here::here("data", "raw"),
-    xpt_file = file.path(outdir, filename),
-    demog_file = file.path(outdir, paste0(version, "_demographics.csv.gz"))
-  )
-for (i in seq(nrow(demog))) {
-  idf = demog[i,]
-  if (!file.exists(idf$xpt_file)) {
-    data_dir = dirname(idf$xpt_file)
-    if (!dir.exists(data_dir)) {
-      dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
-    }
-    curl::curl_download(idf$url, destfile = idf$xpt_file)
-  }
-}
+
 
