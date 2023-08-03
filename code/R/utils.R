@@ -8,7 +8,7 @@ normalize_table_name = function(nh_table) {
 
 nh_table_name = function(table) {
   nh_table = toupper(table)
-  if (grepl("^_Y", nh_table)) {
+  if (grepl("_Y$", nh_table)) {
     nh_table = sub("^(.*)_Y", "Y_\\1", nh_table)
   }
   nh_table
