@@ -25,7 +25,10 @@ process_demog = function(df) {
         age_in_years_at_screening =
           ifelse(age_in_years_at_screening >= 80,
                  "80 years of age and over",
-                 age_in_years_at_screening)
+                 age_in_years_at_screening),
+        age_in_years_at_screening = factor(
+          age_in_years_at_screening,
+          levels = c(0:79,  "80 years of age and over"))
       )
     attributes(df$age_in_years_at_screening) = atr
   }
@@ -43,9 +46,14 @@ read_and_relabel = function(table, ...) {
   df = nhanesA::nhanesTranslate(nh_table = nh_table, data = df,
                                 colnames = colnames(df),
                                 nchar = 100)
-  if (nh_table == "DEMO_G") {
+  recode_vars = NULL
+  if (table == "DEMO_G") {
     recode_vars = c("DMDHHSIZ", "DMDFMSIZ", "DMDHHSZA",
-                    "DMDHHSZB", "DMDHHSZE")
+                    "DMDHHSZB", "DMDHHSZE", "RIDAGEYR")
+  } else if (table == "DEMO_Y") {
+    recode_vars = c("DMDHHSIZ")
+  }
+  if (!is.null(recode_vars)) {
     # cross coding!
     df = nhanesA::nhanesTranslate(
       nh_table = "DEMO_H",
@@ -98,3 +106,4 @@ get_col_from_label = function(df, label) {
   df[, labels %in% label]
 }
 dplyr::bind_rows(dfs)
+label_df(dfs$DEMO_Y) %>% filter(new == "total_number_of_people_in_the_household")
