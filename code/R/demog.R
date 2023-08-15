@@ -34,6 +34,24 @@ process_demog = function(df) {
   }
   df
 }
+
+attach_translations = function(df, translations) {
+  cn = colnames(df)
+  for (icn in cn) {
+    attr(df[[icn]], "variable_name") = icn
+    attr(df[[icn]], "translation") = translations[[icn]]
+  }
+  df
+}
+
+labels_to_colnames = function(df) {
+  cn = sapply(df, attr, "label")
+  stopifnot(is.vector(cn) && length(cn) == ncol(df))
+  cn = janitor::make_clean_names(cn)
+  colnames(df) = cn
+  df
+}
+
 read_and_relabel = function(table, ...) {
   file = here::here("data", "demographics", paste0(table, ".XPT"))
   df = haven::read_xpt(file, ...)
@@ -69,14 +87,8 @@ read_and_relabel = function(table, ...) {
     translations = c(translations, tt)
   }
 
-  cn = colnames(df)
-  for (icn in cn) {
-    attr(df[[icn]], "variable_name") = icn
-    attr(df[[icn]], "translation") = translations[[icn]]
-  }
-  cn = sapply(df, attr, "label")
-  cn = janitor::make_clean_names(cn)
-  colnames(df) = cn
+  df = attach_translations(df, translations = translations)
+  df = labels_to_colnames(df)
 
   norm_table = normalize_table_name(nh_table)
   df = process_demog(df)
@@ -84,7 +96,7 @@ read_and_relabel = function(table, ...) {
     dplyr::mutate(
       nh_table = table,
       table = norm_table,
-      wave = sub(".*_(.*)", "\\1", tolower(norm_table)),
+      wave = get_wave(nh_table),
       version = paste0("pax_", wave)
     )
   df = tibble::as_tibble(df)

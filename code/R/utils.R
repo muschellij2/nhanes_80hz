@@ -14,6 +14,10 @@ nh_table_name = function(table) {
   nh_table
 }
 
+get_wave = function(nh_table) {
+  norm_table = normalize_table_name(nh_table)
+  sub(".*_(.*)", "\\1", tolower(norm_table))
+}
 
 nhanes_xpt_url = function(nh_table) {
   nh_table = nh_table_name(nh_table)
@@ -27,7 +31,7 @@ nhanes_xpt_url = function(nh_table) {
   }
   url
 }
-get_xpt = function(nh_table) {
+table_to_outdir = function(nh_table) {
   nh_table = nh_table_name(nh_table)
   table = normalize_table_name(nh_table)
   nh_tab = tolower(table)
@@ -38,6 +42,13 @@ get_xpt = function(nh_table) {
     grepl("^demo", nh_tab) ~ "demographics",
     TRUE ~ NA_character_
   )
+  outdir
+}
+get_xpt = function(nh_table) {
+  nh_table = nh_table_name(nh_table)
+  table = normalize_table_name(nh_table)
+  outdir = table_to_outdir(nh_table)
+
   stopifnot(!is.na(outdir))
   data_dir = here::here("data", outdir)
   dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
@@ -52,3 +63,24 @@ get_xpt = function(nh_table) {
   file
 }
 
+
+
+
+read_daily_min = function(nh_table, ...) {
+  nh_table = nh_table_name(nh_table)
+  outdir = table_to_outdir(nh_table)
+  stopifnot(!is.na(outdir))
+  wave = get_wave(nh_table)
+  pax_name = paste0("pax_", wave)
+
+  data_dir = here::here("data", outdir)
+  # dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
+
+  outfile = normalize_table_name(nh_table)
+  outfile = paste0(outfile, ".XPT")
+  file = file.path(data_dir, outfile)
+  if (file.exists(file)) {
+    df = haven::read_xpt(file, ...)
+  }
+  df
+}
