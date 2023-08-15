@@ -163,11 +163,10 @@ tarball_df = function(
 }
 
 write_csv_gz = function(df, file, ...) {
-  csv_file = sub("[.]gz", "", file, ignore.case = TRUE)
-  readr::write_csv(df, csv_file)
-  R.utils::gzip(csv_file, remove = TRUE, overwrite = TRUE,
-                compression = 9)
-  return(paste0(csv_file, ".gz"))
+  conn = gzfile(file, compression = 9, open = "wb")
+  readr::write_csv(df, conn, ...)
+  close(conn)
+  return(file)
 }
 
 tarball_to_csv = function(tarball_file,

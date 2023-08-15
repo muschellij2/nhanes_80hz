@@ -65,8 +65,7 @@ get_xpt = function(nh_table) {
 
 
 
-
-read_daily_min = function(nh_table, ...) {
+daily_min_file = function(nh_table) {
   nh_table = nh_table_name(nh_table)
   outdir = table_to_outdir(nh_table)
   stopifnot(!is.na(outdir))
@@ -79,6 +78,10 @@ read_daily_min = function(nh_table, ...) {
   outfile = normalize_table_name(nh_table)
   outfile = paste0(outfile, ".XPT")
   file = file.path(data_dir, outfile)
+  file
+}
+read_daily_min = function(nh_table, ...) {
+  file = daily_min_file(nh_table)
   if (file.exists(file)) {
     df = haven::read_xpt(file, ...)
   }
