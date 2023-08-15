@@ -23,14 +23,14 @@ write_individual_data = function(df = NULL, nh_table,
 
   uids = unique(df$SEQN)
   iid = uids[1]
+  df = split(df, df$SEQN)
   for (iid in uids) {
     outfile = file.path(table_dir, paste0(iid, ".csv.gz"))
     if (verbose) {
       print(outfile)
     }
     if (!file.exists(outfile)) {
-      idf = df %>%
-        dplyr::filter(SEQN == iid)
+      idf = df[[as.character(iid)]]
       write_csv_gz(idf, outfile)
     }
   }
