@@ -46,13 +46,13 @@ for (iid in uids) {
     acc_data = readr::read_csv(csv_file)
     irow = 1
     for (irow in seq(nrow(idf))) {
-
       new_sample_rate = idf$sample_rate[irow] %>% as.integer()
       new_data = walking::resample_accel_data(
         data = acc_data,
         sample_rate = new_sample_rate)
       write_csv_gz(new_data, file = idf$file[irow])
       print(idf$file[irow])
+      rm(new_data)
     }
   }
 }
