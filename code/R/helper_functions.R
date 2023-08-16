@@ -163,6 +163,9 @@ tarball_df = function(
 }
 
 write_csv_gz = function(df, file, ...) {
+  dir.create(dirname(file),
+             showWarnings = FALSE,
+             recursive = TRUE)
   conn = gzfile(file, compression = 9, open = "wb")
   readr::write_csv(df, conn, ...)
   close(conn)

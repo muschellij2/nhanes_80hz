@@ -97,13 +97,13 @@ get_version_filenames = function(nhanes_version) {
                                folder_name, id),
       csv_file = make_csv_name(paste0("csv", suffix),
                                folder_name, id),
-      csv15_file = make_csv_name(paste0("csv", suffix),
+      csv15_file = make_csv_name(paste0("csv_15", suffix),
                                folder_name, id),
-      csv10_file = make_csv_name(paste0("csv", suffix),
+      csv10_file = make_csv_name(paste0("csv_10", suffix),
                                folder_name, id),
-      csv30_file = make_csv_name(paste0("csv", suffix),
+      csv30_file = make_csv_name(paste0("csv_30", suffix),
                                  folder_name, id),
-      csv100_file = make_csv_name(paste0("csv", suffix),
+      csv100_file = make_csv_name(paste0("csv_100", suffix),
                                  folder_name, id)
     )
   df = df %>%
