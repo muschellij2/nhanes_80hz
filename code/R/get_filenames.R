@@ -96,7 +96,13 @@ get_version_filenames = function(nhanes_version) {
       log_file = make_csv_name(paste0("logs", suffix),
                                folder_name, id),
       csv_file = make_csv_name(paste0("csv", suffix),
-                               folder_name, id)
+                               folder_name, id),
+      csv15_file = make_csv_name(paste0("csv", suffix),
+                               folder_name, id),
+      csv10_file = make_csv_name(paste0("csv", suffix),
+                               folder_name, id),
+      csv100_file = make_csv_name(paste0("csv", suffix),
+                                 folder_name, id)
     )
   df = df %>%
     dplyr::mutate(version = folder_name) %>%

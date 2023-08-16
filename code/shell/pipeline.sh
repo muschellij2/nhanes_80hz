@@ -8,4 +8,7 @@ Rnosave code/R/tarball_to_csv.R -N TARBALL -t 1-56 -l mem_free=20G,h_vmem=21G
 
 Rnosave code/R/run_process.R -N PROC -hold_jid_ad TARBALL -t 1-56 -l mem_free=20G,h_vmem=21G
 
-Rnosave code/R/split_daily_minute.R -N SPLIT -l mem_free=20G,h_vmem=21G
+Rnosave code/R/split_daily_minutely.R -N SPLIT -l mem_free=20G,h_vmem=21G
+
+Rnosave code/R/split_daily_minutely.R --job-name=SPLIT --mem=21G
+

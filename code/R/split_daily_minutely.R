@@ -1,7 +1,7 @@
 library(dplyr)
 library(here)
-source("code/R/utils.R")
-source("code/R/helper_functions.R")
+source(here::here("code/R/utils.R"))
+source(here::here("code/R/helper_functions.R"))
 
 nh_table = "PAXMIN_H"
 df = NULL
