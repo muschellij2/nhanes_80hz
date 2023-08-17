@@ -1,4 +1,5 @@
 options(digits.secs = 3)
+options(readr.num_threads = 1)
 
 have_pigz = function() {
   pigz = Sys.which("pigz")
