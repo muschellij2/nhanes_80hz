@@ -43,7 +43,7 @@ for (iid in uids) {
   if (!all(idf$fe)) {
     idf = idf %>%
       dplyr::filter(!fe)
-    acc_data = readr::read_csv(csv_file)
+    acc_data = readr::read_csv(csv_file, num_threads = 1)
     irow = 1
     for (irow in seq(nrow(idf))) {
       new_sample_rate = idf$sample_rate[irow] %>% as.integer()
