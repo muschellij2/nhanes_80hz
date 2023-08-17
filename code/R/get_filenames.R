@@ -2,7 +2,7 @@ library(rvest)
 library(curl)
 library(dplyr)
 library(here)
-source("code/R/utils.R")
+source(here::here("code/R/utils.R"))
 n_folds = 200
 
 remove_double_space = function(x) {

@@ -142,7 +142,7 @@ tarball_df = function(
 
   files = list.files(path = tdir, full.names = FALSE, recursive = TRUE)
   meta_df = make_meta_df_from_files(files)
-  readr::write_csv(meta_df, file = meta_file)
+  readr::write_csv(meta_df, file = meta_file, num_threads = num_threads)
 
   files = list.files(path = tdir, full.names = TRUE)
   included_log_file = files[grepl("_log", files, ignore.case = TRUE)]
@@ -162,12 +162,19 @@ tarball_df = function(
   return(df)
 }
 
-write_csv_gz = function(df, file, ...) {
+write_csv_gz = function(
+    df, file,
+    num_threads = 1L,
+    ...) {
   dir.create(dirname(file),
              showWarnings = FALSE,
              recursive = TRUE)
   conn = gzfile(file, compression = 9, open = "wb")
-  readr::write_csv(df, conn, ...)
+  readr::write_csv(
+    df,
+    conn,
+    ...,
+    num_threads = num_threads)
   close(conn)
   return(file)
 }
