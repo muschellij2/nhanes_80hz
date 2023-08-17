@@ -50,6 +50,7 @@ for (iid in uids) {
       new_data = walking::resample_accel_data(
         data = acc_data,
         sample_rate = new_sample_rate)
+      print("Writing Data")
       write_csv_gz(new_data, file = idf$file[irow])
       print(idf$file[irow])
       rm(new_data)
