@@ -43,7 +43,8 @@ for (iid in uids) {
   if (!all(idf$fe)) {
     idf = idf %>%
       dplyr::filter(!fe)
-    acc_data = readr::read_csv(csv_file, num_threads = 1)
+    # acc_data = readr::read_csv(csv_file, num_threads = 1, guess_max = Inf)
+    acc_data = read_80hz(csv_file)
     readr::stop_for_problems(acc_data)
     irow = 1
     for (irow in seq(nrow(idf))) {
