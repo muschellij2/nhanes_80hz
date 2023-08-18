@@ -57,6 +57,9 @@ for (iid in uids) {
       write_csv_gz(new_data, file = idf$file[irow])
       print(idf$file[irow])
       rm(new_data)
+      gc()
     }
+    rm(acc_data)
+    gc()
   }
 }
