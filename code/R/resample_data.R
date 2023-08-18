@@ -45,6 +45,7 @@ for (iid in uids) {
       dplyr::filter(!fe)
     # acc_data = readr::read_csv(csv_file, num_threads = 1, guess_max = Inf)
     acc_data = read_80hz(csv_file)
+    message(paste0("Checking for problems in ", csv_file))
     readr::stop_for_problems(acc_data)
     irow = 1
     for (irow in seq(nrow(idf))) {
