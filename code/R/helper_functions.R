@@ -314,6 +314,10 @@ read_80hz = function(file, num_threads = 1, ...) {
                      col_types = col_types_80hz,
                      num_threads = num_threads,
                      ...)
+  probs = vroom::problems(dat)
+  stopifnot(nrow(probs) == 0)
+  readr::stop_for_problems(dat)
+  dat
 }
 
 col_time_with_frac_secs = function(...) {
