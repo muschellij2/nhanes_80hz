@@ -1,4 +1,5 @@
 library(read.gt3x)
+options(digits.secs = 3)
 file = "PU6_CLE2B21130055_2017-03-28.gt3x"
 exdir = tempdir()
 files = unzip(file, exdir = exdir)
@@ -16,6 +17,80 @@ packets = split(df, df$second)
 packets = unname(packets)
 scale = info$`Acceleration Scale`
 packet = packets[[5]]
+
+function(
+    df,
+    sample_rate = 30L,
+    max_g = c("8", "6")) {
+  range_date = range(df$time, na.rm = TRUE)
+  range_date = c(
+    lubridate::floor_date(range_date[1], "seconds"),
+    lubridate::ceiling_date(range_date[2], "seconds")
+  )
+
+  max_g = match.arg(max_g)
+  serial_prefix = switch(
+    max_g,
+    "6" = "CLE2F",
+    "8" = "MOS2F")
+  acceleration_scale = switch(
+    max_g,
+    "6" = 341L,
+    "8" = 256L)
+
+  serial_number = paste0(serial_prefix,
+                         paste(rep("0", 13-nchar(serial_prefix))))
+  device_type = switch(
+    max_g,
+    "6" = "wGT3XPlus",
+    "8" = "wGT3XBT")
+  dynamic_range = as.integer(max_g)
+  dynamic_range = c(-dynamic_range, dynamic_range)
+
+  board_revision = switch(
+    max_g,
+    "6" = "1",
+    "8" = "4"
+  )
+  unexpected_resets = "0"
+  battery_voltage = "4.00"
+
+  firmware = switch(
+    max_g,
+    "6" = "2.5.0",
+    "8" = "1.9.2"
+  )
+  out = c(
+    "Serial Number" = serial_number,
+    "Device Type" = device_type,
+    "Firmware" = firmware,
+    "Battery Voltage" = battery_voltage,
+    "Sample Rate" = sample_rate,
+    # XXX,
+    "Board Revision" = board_revision,
+    "Unexpected Resets" = unexpected_resets,
+    "Acceleration Scale" = sprintf("%.1f", acceleration_scale),
+    "Acceleration Min" = sprintf("%.1f", dynamic_range[1]),
+    "Acceleration Max" = sprintf("%.1f", dynamic_range[2]),
+
+  )
+
+  [6] "Start Date: 636380496000000000"
+  [7] "Stop Date: 636386544000000000"
+  [8] "Last Sample Time: 636386544000000000"
+  [9] "TimeZone: 01:00:00"
+  [10] "Download Date: 636397096570000000"
+  [11] "Board Revision: 4"
+  [12] "Unexpected Resets: 0"
+  [13] "Acceleration Scale: 256.0"
+  [14] "Acceleration Min: -8.0"
+  [15] "Acceleration Max: 8.0"
+  [16] "Limb: Wrist"
+  [17] "Side: Right"
+  [18] "Dominance: Dominant"
+  [19] "Subject Name: P09"
+
+}
 
 create_packet = function(packet, scale = 341L) {
 
