@@ -98,12 +98,22 @@ get_version_filenames = function(nhanes_version) {
       csv_file = make_csv_name(paste0("csv", suffix),
                                folder_name, id),
       csv15_file = make_csv_name(paste0("csv_15", suffix),
-                               folder_name, id),
+                                 folder_name, id),
       csv10_file = make_csv_name(paste0("csv_10", suffix),
-                               folder_name, id),
+                                 folder_name, id),
       csv30_file = make_csv_name(paste0("csv_30", suffix),
                                  folder_name, id),
       csv100_file = make_csv_name(paste0("csv_100", suffix),
+                                  folder_name, id)
+    )
+
+  df = df %>%
+    dplyr::mutate(
+      oak_file = make_csv_name(paste0("oak", suffix),
+                               folder_name, id),
+      verisense_file = make_csv_name(paste0("verisense", suffix),
+                                     folder_name, id),
+      adept_file = make_csv_name(paste0("adept", suffix),
                                  folder_name, id)
     )
   df = df %>%

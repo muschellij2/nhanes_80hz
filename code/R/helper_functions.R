@@ -319,6 +319,9 @@ read_80hz = function(file, num_threads = 1, ...) {
   readr::stop_for_problems(dat)
   dat
 }
+# pad_80hz = function(df) {
+#
+# }
 
 col_time_with_frac_secs = function(...) {
   vroom::col_time(format = "%H:%M:%OS", ...)

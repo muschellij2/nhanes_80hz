@@ -20,3 +20,10 @@ find_walking.m
 MatlabServer.m
 code/scratch
 literature
+73562_fake.gt3x
+write_fake_gt3x.R
+write_gt3x.R
+*.gt3x
+adept_test.R
+comparison.R
+fast_running_cross.R
