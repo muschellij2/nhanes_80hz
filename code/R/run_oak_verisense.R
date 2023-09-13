@@ -20,7 +20,7 @@ if (!is.na(ifold)) {
 
 max_n = nrow(df)
 index = 1
-# for (index in seq(max_n)) {
+for (index in seq(max_n)) {
   # print(index)
   idf = df[index,]
   print(paste0(index, " of ", max_n))
@@ -97,6 +97,6 @@ index = 1
     write_csv_gz(df = result$oak, file = idf$oak_file)
     write_csv_gz(df = result$verisense, file = idf$verisense_file)
   }
-# }
+}
 
 
