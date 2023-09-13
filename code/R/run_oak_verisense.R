@@ -96,6 +96,9 @@ for (index in seq(max_n)) {
     result = lapply(result, dplyr::as_tibble)
     write_csv_gz(df = result$oak, file = idf$oak_file)
     write_csv_gz(df = result$verisense, file = idf$verisense_file)
+
+    rm(df)
+    rm(result)
   }
 }
 
