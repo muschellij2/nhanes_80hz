@@ -40,17 +40,17 @@ for (index in seq(max_n)) {
     idf$verisense_file
   )
   sapply(dirname(outfiles), dir.create, showWarnings = FALSE, recursive = TRUE)
-  get_walking = function(df, sample_rate = 80L) {
-    df = walking::standardise_data(df)
-    oak = estimate_steps_forest(df)
+  get_walking = function(data, sample_rate = 80L) {
+    data = walking::standardise_data(data)
+    oak = estimate_steps_forest(data)
     message("OAK completed")
     vs = estimate_steps_verisense(
-      df,
+      data,
       sample_rate = sample_rate,
       method = "original")
     message("Verisense completed")
     vs_revised = estimate_steps_verisense(
-      df,
+      data,
       sample_rate = sample_rate,
       method = "revised")
     message("Verisense revised completed")
@@ -76,21 +76,21 @@ for (index in seq(max_n)) {
 
     data = read_80hz(idf$csv10_file, progress = FALSE)
     out10 = get_walking(data, sample_rate = 10L)
-    renamer = function(df, prefix) {
-      cn = colnames(df)
+    renamer = function(data, prefix) {
+      cn = colnames(data)
       timecol = cn %in% "time"
       cn[!timecol] = paste0(prefix, cn[!timecol])
-      colnames(df) = cn
-      df
+      colnames(data) = cn
+      data
     }
     nn = c("oak", "vs", "vs_revised")
     result = lapply(nn, function(x) {
       prefix = paste0(x, "_")
-      df = out[[x]] %>% renamer(prefix)
-      df10 = out10[[x]] %>% renamer(prefix)
-      df15 = out15[[x]] %>% renamer(prefix)
-      res = dplyr::left_join(df, df10)
-      res = dplyr::left_join(res, df15)
+      data = out[[x]] %>% renamer(prefix)
+      data10 = out10[[x]] %>% renamer(prefix)
+      data15 = out15[[x]] %>% renamer(prefix)
+      res = dplyr::left_join(data, data10)
+      res = dplyr::left_join(res, data15)
       res$time = c(unlist(res$time))
       res
     })
@@ -100,7 +100,7 @@ for (index in seq(max_n)) {
     write_csv_gz(df = result$oak, file = idf$oak_file)
     write_csv_gz(df = result$verisense, file = idf$verisense_file)
 
-    rm(df)
+    rm(data)
     rm(result)
   }
 }
