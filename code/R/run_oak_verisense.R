@@ -1,6 +1,9 @@
 #!/usr/bin/env Rscript
 library(dplyr)
 library(walking)
+# needed because
+# https://github.com/OverLordGoldDragon/ssqueezepy#gpu--cpu-acceleration
+Sys.setenv("SSQ_PARALLEL" = 0)
 options(digits.secs = 3)
 source(here::here("code", "R", "helper_functions.R"))
 fold = NULL
@@ -65,14 +68,14 @@ for (index in seq(max_n)) {
   }
 
   if (!all(file.exists(outfiles)) && all(file.exists(files))) {
-    df = read_80hz(idf$csv_file, progress = FALSE)
-    out = get_walking(df, sample_rate = 80L)
+    data = read_80hz(idf$csv_file, progress = FALSE)
+    out = get_walking(data, sample_rate = 80L)
 
-    df = read_80hz(idf$csv15_file, progress = FALSE)
-    out15 = get_walking(df, sample_rate = 15L)
+    data = read_80hz(idf$csv15_file, progress = FALSE)
+    out15 = get_walking(data, sample_rate = 15L)
 
-    df = read_80hz(idf$csv10_file, progress = FALSE)
-    out10 = get_walking(df, sample_rate = 10L)
+    data = read_80hz(idf$csv10_file, progress = FALSE)
+    out10 = get_walking(data, sample_rate = 10L)
     renamer = function(df, prefix) {
       cn = colnames(df)
       timecol = cn %in% "time"
