@@ -70,12 +70,16 @@ for (index in seq(max_n)) {
   if (!all(file.exists(outfiles)) && all(file.exists(files))) {
     data = read_80hz(idf$csv_file, progress = FALSE)
     out = get_walking(data, sample_rate = 80L)
+    rm(data)
 
     data = read_80hz(idf$csv15_file, progress = FALSE)
     out15 = get_walking(data, sample_rate = 15L)
+    rm(data)
 
     data = read_80hz(idf$csv10_file, progress = FALSE)
     out10 = get_walking(data, sample_rate = 10L)
+    rm(data)
+
     renamer = function(data, prefix) {
       cn = colnames(data)
       timecol = cn %in% "time"
