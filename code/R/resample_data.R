@@ -9,11 +9,7 @@ source(here::here("code", "R", "utils.R"))
 df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 xdf = df
 
-ifold = as.numeric(Sys.getenv("SGE_TASK_ID"))
-if (is.na(ifold)) {
-  ifold = as.numeric(Sys.getenv("SLURM_ARRAY_TASK_ID"))
-}
-print(paste0("fold is: ", ifold))
+ifold = get_fold()
 if (!is.na(ifold)) {
   df = df %>%
     dplyr::filter(fold %in% ifold)
