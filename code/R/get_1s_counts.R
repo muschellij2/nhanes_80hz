@@ -34,14 +34,18 @@ for (index in seq(max_n)) {
 
   if (!all(file.exists(unlist(files)))) {
     x = agcounter::convert_counts_csv(
-      idf$csv_file,
+      file = idf$csv_file,
       outfile = idf$counts_1s_file,
-      tarball_file = files$tarball_file,
-      csv_file = files$csv_file,
-      log_file = files$log_file,
-      meta_file = files$meta_file,
-      num_threads = 1
+      sample_rate = 80L,
+      epoch_in_seconds = 1L,
+      time_column = "HEADER_TIMESTAMP"
     )
+    # df = read_80hz(idf$csv_file)
+    # x = agcounter::get_counts(
+    #   df,
+    #   sample_rate = 80L,
+    #   epoch_in_seconds = 1L
+    # )
     # doing this so .Last.value isn't maintained
     rm(x)
   }
