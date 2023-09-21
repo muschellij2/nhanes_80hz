@@ -19,23 +19,23 @@ if (!is.na(ifold)) {
 xdf = df
 
 df = df %>%
-  dplyr::filter(file.exists(tarball_file))
+  dplyr::filter(file.exists(csv_file))
 
 max_n = nrow(df)
 index = 1
 for (index in seq(max_n)) {
   # print(index)
   idf = df[index,]
-  print(idf$tarball_file)
+  print(idf$csv_file)
   files = list(
-    tarball_file = idf$tarball_file,
-    csv_file = idf$csv_file,
-    log_file = idf$log_file,
-    meta_file = idf$meta_file
+    counts_1s_file = idf$counts_1s_file
   )
+  dir.create(dirname(idf$counts_1s_file), showWarnings = FALSE, recursive = TRUE)
 
   if (!all(file.exists(unlist(files)))) {
-    x = tarball_to_csv(
+    x = agcounter::convert_counts_csv(
+      idf$csv_file,
+      outfile = idf$counts_1s_file,
       tarball_file = files$tarball_file,
       csv_file = files$csv_file,
       log_file = files$log_file,
