@@ -25,6 +25,6 @@ Rnosave code/R/resample_data.R -J RESAMPLE --array=195-200 --mem=30G -o %x_%A_%a
 # Rnosave code/R/split_daily_minutely.R -N SPLIT -l mem_free=20G,h_vmem=21G
 Rnosave code/R/split_daily_minutely.R -J SPLIT --mem=21G
 
-Rnosave code/R/run_oak_verisense.R -N WALK -t 1-5 -l mem_free=51G,h_vmem=54G
-Rnosave code/R/run_oak_verisense.R -J WALK --array=195-200 --mem=52G -o %x_%A_%a.out -e %x_%A_%a.err
+Rnosave code/R/run_oak_verisense.R -N WALK -t 6-20 -l mem_free=51G,h_vmem=52G
+Rnosave code/R/run_oak_verisense.R -J WALK --array=21-100 --mem=52G -o %x_%A_%a.out -e %x_%A_%a.err
 
