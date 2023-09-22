@@ -26,7 +26,7 @@ index = 1
 for (index in seq(max_n)) {
   # print(index)
   idf = df[index,]
-  print(paste0("File ", index, ": ", idf$csv_file))
+  print(paste0("File ", index, "of ", max_n, ": ", idf$csv_file))
   files = list(
     counts_1s_file = idf$counts_1s_file
   )
