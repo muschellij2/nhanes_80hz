@@ -32,6 +32,7 @@ for (index in seq(max_n)) {
     counts_60s_file = idf$counts_60s_file
   )
   dir.create(dirname(idf$counts_1s_file), showWarnings = FALSE, recursive = TRUE)
+  dir.create(dirname(idf$counts_60s_file), showWarnings = FALSE, recursive = TRUE)
 
   if (!all(file.exists(unlist(files)))) {
     if (!file.exists(idf$counts_1s_file)) {
