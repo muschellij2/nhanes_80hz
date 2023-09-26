@@ -97,10 +97,13 @@ get_version_filenames = function(nhanes_version) {
                                folder_name, id),
 
       counts_1s_file = make_csv_name(paste0("counts_1s", suffix),
-                               folder_name, id),
+                                     folder_name, id),
+      counts_60s_file = make_csv_name(paste0("counts_60s", suffix),
+                                     folder_name, id),
+
 
       counts_file = make_csv_name(paste0("counts", suffix),
-                               folder_name, id),
+                                  folder_name, id),
 
       csv_file = make_csv_name(paste0("csv", suffix),
                                folder_name, id),

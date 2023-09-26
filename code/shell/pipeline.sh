@@ -19,7 +19,7 @@ Rnosave code/R/run_process.R -N PROC -hold_jid_ad TARBALL -t 1-200 -l mem_free=2
 Rnosave code/R/resample_data.R -J PROC --array=1-200  --mem=22G ${dependency}
 
 Rnosave code/R/get_1s_counts.R -N ONESEC -t 1-5 -l mem_free=20G,h_vmem=21G
-Rnosave code/R/get_1s_counts.R -J ONESEC --array=1-5 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err
+Rnosave code/R/get_1s_counts.R -J ONESEC --array=6-10 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err
 
 Rnosave code/R/resample_data.R -N RESAMPLE -t 5-200 -l mem_free=30G,h_vmem=30G
 Rnosave code/R/resample_data.R -J RESAMPLE --array=195-200 --mem=30G -o %x_%A_%a.out -e %x_%A_%a.err
@@ -28,6 +28,6 @@ Rnosave code/R/resample_data.R -J RESAMPLE --array=195-200 --mem=30G -o %x_%A_%a
 # Rnosave code/R/split_daily_minutely.R -N SPLIT -l mem_free=20G,h_vmem=21G
 Rnosave code/R/split_daily_minutely.R -J SPLIT --mem=21G
 
-Rnosave code/R/run_oak_verisense.R -N WALK -t 6-20 -l mem_free=51G,h_vmem=52G
-Rnosave code/R/run_oak_verisense.R -J WALK --array=21-100 --mem=52G -o %x_%A_%a.out -e %x_%A_%a.err
+Rnosave code/R/run_oak_verisense.R -N WALK -t 180-194 -l mem_free=51G,h_vmem=52G
+Rnosave code/R/run_oak_verisense.R -J WALK --array=101-200 --mem=52G -o %x_%A_%a.out -e %x_%A_%a.err
 

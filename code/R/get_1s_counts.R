@@ -28,18 +28,30 @@ for (index in seq(max_n)) {
   idf = df[index,]
   print(paste0("File ", index, " of ", max_n, ": ", idf$csv_file))
   files = list(
-    counts_1s_file = idf$counts_1s_file
+    counts_1s_file = idf$counts_1s_file,
+    counts_60s_file = idf$counts_60s_file
   )
   dir.create(dirname(idf$counts_1s_file), showWarnings = FALSE, recursive = TRUE)
 
   if (!all(file.exists(unlist(files)))) {
-    x = agcounter::convert_counts_csv(
-      file = idf$csv_file,
-      outfile = idf$counts_1s_file,
-      sample_rate = 80L,
-      epoch_in_seconds = 1L,
-      time_column = "HEADER_TIMESTAMP"
-    )
+    if (!file.exists(idf$counts_1s_file)) {
+      x = agcounter::convert_counts_csv(
+        file = idf$csv_file,
+        outfile = idf$counts_1s_file,
+        sample_rate = 80L,
+        epoch_in_seconds = 1L,
+        time_column = "HEADER_TIMESTAMP"
+      )
+    }
+    if (!file.exists(idf$counts_60s_file)) {
+      x = agcounter::convert_counts_csv(
+        file = idf$csv_file,
+        outfile = idf$counts_60s_file,
+        sample_rate = 80L,
+        epoch_in_seconds = 60L,
+        time_column = "HEADER_TIMESTAMP"
+      )
+    }
     # df = read_80hz(idf$csv_file)
     # x = agcounter::get_counts(
     #   df,
