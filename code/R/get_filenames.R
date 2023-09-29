@@ -32,24 +32,31 @@ get_version_filenames = function(nhanes_version) {
   if (!dir.exists(data_dir)) {
     dir.create(data_dir, showWarnings = FALSE, recursive = TRUE)
   }
+
+  # get the full URL
   file = file.path(data_dir, paste0(table, "_index.html"))
   base_url = "https://ftp.cdc.gov"
   url = paste0(base_url, "/pub/", nhanes_version, "/")
+
+  # download the HTML if not already here (or new clone of repo)
   if (!file.exists(file)) {
     curl::curl_download(url, destfile = file)
   }
+  # read the HTML as a Document we can use some XPATH/CSS to query
   doc = read_html(file)
 
-
+  # Give me the links!
   hrefs = read_html_newline(file) %>%
     html_nodes("a") %>%
     html_attr("href")
+  # Only relevant links
   hrefs = hrefs[tools::file_ext(hrefs) %in% "bz2"]
   stubs = unique(dirname(hrefs))
   stopifnot(length(stubs) == 1)
 
   stopifnot(stubs == paste0("/pub/", nhanes_version))
 
+  # read in the table of all the files available
   doc = read_html_newline(file) %>%
     html_nodes("pre")
   x = doc %>%  html_text()

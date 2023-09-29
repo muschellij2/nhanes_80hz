@@ -4,9 +4,6 @@ library(tidyr)
 library(agcounter)
 library(SummarizedActigraphy)
 options(digits.secs = 3)
-if (Sys.info()[["user"]] == "johnmuschelli") {
-  reticulate::use_python("/Users/johnmuschelli/miniconda3/bin/python3")
-}
 suppressPackageStartupMessages(library("optparse"))
 source(here::here("code", "R", "helper_functions.R"))
 source(here::here("code", "R", "utils.R"))

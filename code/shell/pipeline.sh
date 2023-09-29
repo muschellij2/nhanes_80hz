@@ -19,7 +19,8 @@ Rnosave code/R/run_process.R -N PROC -hold_jid_ad TARBALL -t 1-200 -l mem_free=2
 Rnosave code/R/resample_data.R -J PROC --array=1-200  --mem=22G ${dependency}
 
 Rnosave code/R/get_1s_counts.R -N ONESEC -t 1-5 -l mem_free=20G,h_vmem=21G
-Rnosave code/R/get_1s_counts.R -J ONESEC --array=6-10 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err
+onecpu="--nodes=1 --ntasks=1 --cpus-per-task=1"
+Rnosave code/R/get_1s_counts.R -J ONESEC --array=1-200 "${onecpu}" --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err
 
 Rnosave code/R/resample_data.R -N RESAMPLE -t 5-200 -l mem_free=30G,h_vmem=30G
 Rnosave code/R/resample_data.R -J RESAMPLE --array=195-200 --mem=30G -o %x_%A_%a.out -e %x_%A_%a.err

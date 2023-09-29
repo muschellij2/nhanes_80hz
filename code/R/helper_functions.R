@@ -137,15 +137,20 @@ tarball_df = function(
   dir.create(dirname(meta_file), showWarnings = FALSE, recursive = TRUE)
   tdir = tempfile()
 
+  # create a temporary directory to put the unzipped data
   dir.create(tdir, showWarnings = TRUE)
   exit_code = untar(tarfile = tarball_file, exdir = tdir, verbose = TRUE)
   stopifnot(exit_code == 0)
 
+  # List out the files
   files = list.files(path = tdir, full.names = FALSE, recursive = TRUE)
+  # Create metadata dataset that puts all the hourly files into a df
   meta_df = make_meta_df_from_files(files)
   readr::write_csv(meta_df, file = meta_file, num_threads = num_threads)
 
+  # get all the files in the tarball
   files = list.files(path = tdir, full.names = TRUE)
+  # logs are different
   included_log_file = files[grepl("_log", files, ignore.case = TRUE)]
   stopifnot(length(included_log_file) <= 1)
   if (length(included_log_file) == 1) {
@@ -154,6 +159,7 @@ tarball_df = function(
                   compression = 9)
   }
   csv_files = files[!grepl("_log", files, ignore.case = TRUE)]
+  # Read in the Data:   HEADER_TIMESTAMP, X, Y, Z (col_types_80hz)
   df = vroom::vroom(csv_files, num_threads = num_threads,
                     col_types = col_types_80hz)
   attr(df, "log_file") = log_file
