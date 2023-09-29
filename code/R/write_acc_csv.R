@@ -1,5 +1,6 @@
 library(magrittr)
 library(dplyr)
+library(write.gt3x)
 options(digits.secs = 3)
 source(here::here("code", "R", "helper_functions.R"))
 source(here::here("code", "R", "utils.R"))
@@ -28,38 +29,21 @@ for (index in seq(max_n)) {
   idf = df[index,]
   print(paste0("File ", index, " of ", max_n, ": ", idf$csv_file))
   files = list(
-    counts_1s_file = idf$counts_1s_file,
-    counts_60s_file = idf$counts_60s_file
+    acc_csv_file = idf$acc_csv_file
   )
-  dir.create(dirname(idf$counts_1s_file), showWarnings = FALSE, recursive = TRUE)
-  dir.create(dirname(idf$counts_60s_file), showWarnings = FALSE, recursive = TRUE)
+  dir.create(dirname(idf$acc_csv_file), showWarnings = FALSE, recursive = TRUE)
 
   if (!all(file.exists(unlist(files)))) {
-    if (!file.exists(idf$counts_1s_file)) {
-      x = agcounter::convert_counts_csv(
-        file = idf$csv_file,
-        outfile = idf$counts_1s_file,
+    if (!file.exists(idf$acc_csv_file)) {
+      df = read_80hz(idf$csv_file)
+      write.gt3x::write_actigraph_csv(
+        df = df,
+        file = idf$acc_csv_file,
         sample_rate = 80L,
-        epoch_in_seconds = 1L,
-        time_column = "HEADER_TIMESTAMP"
-      )
+        max_g = "8")
+      # doing this so .Last.value isn't maintained
+      rm(df)
     }
-    if (!file.exists(idf$counts_60s_file)) {
-      x = agcounter::convert_counts_csv(
-        file = idf$csv_file,
-        outfile = idf$counts_60s_file,
-        sample_rate = 80L,
-        epoch_in_seconds = 60L,
-        time_column = "HEADER_TIMESTAMP"
-      )
-    }
-    # df = read_80hz(idf$csv_file)
-    # x = agcounter::get_counts(
-    #   df,
-    #   sample_rate = 80L,
-    #   epoch_in_seconds = 1L
-    # )
-    # doing this so .Last.value isn't maintained
-    rm(x)
+
   }
 }
