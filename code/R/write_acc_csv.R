@@ -36,6 +36,8 @@ for (index in seq(max_n)) {
   if (!all(file.exists(unlist(files)))) {
     if (!file.exists(idf$acc_csv_file)) {
       df = read_80hz(idf$csv_file)
+      df = df %>%
+        dplyr::rename(time = any_of(c("HEADER_TIMESTAMP", "HEADER_TIME_STAMP")))
       write.gt3x::write_actigraph_csv(
         df = df,
         file = idf$acc_csv_file,
