@@ -44,7 +44,7 @@ for (index in seq(max_n)) {
         sample_rate = 80L,
         max_g = "8")
       # doing this so .Last.value isn't maintained
-      rm(df)
+      rm(data)
     }
 
   }
