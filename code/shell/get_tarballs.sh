@@ -1,3 +1,4 @@
+#!/bin/bash
 # id=83730
 if [ -z ${version} ];
 then
