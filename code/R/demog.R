@@ -54,6 +54,10 @@ labels_to_colnames = function(df) {
 
 read_and_relabel = function(table, ...) {
   file = here::here("data", "demographics", paste0(table, ".XPT"))
+  if (!file.exists(file)) {
+    url = nhanes_xpt_url(table)
+    curl::curl_download(url, file)
+  }
   df = haven::read_xpt(file, ...)
   table = normalize_table_name(table)
   nh_table = nh_table_name(table)

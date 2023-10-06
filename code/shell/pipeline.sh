@@ -23,7 +23,12 @@ Rnosave code/R/get_1s_counts.R -N ONESEC -t 1-5 -l mem_free=20G,h_vmem=21G
 Rnosave code/R/get_1s_counts.R -J ONESEC --array=1-200 "${onecpu}" --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err
 
 onecpu="--nodes=1 --ntasks=1 --cpus-per-task=1"
-Rnosave code/R/write_acc_csv.R -J ACC_CSV --array=1-5 "${onecpu}" --mem=12G -o %x_%A_%a.out -e %x_%A_%a.err
+Rnosave code/R/write_acc_csv.R -J ACC_CSV --array=51-52,54-55,57-64,66-67,69-76,78-137 "${onecpu}" --mem=10G -o %x_%A_%a.out -e %x_%A_%a.err
+# --exclude=compute-115
+Rnosave code/R/write_acc_csv.R -J ACC_CSV --array=18 "${onecpu}" --mem=10G -o %x_%A_%a.out -e %x_%A_%a.err
+Rnosave code/R/write_acc_csv.R -N ACC_CSV -t 18 -l mem_free=12G,h_vmem=12G
+
+
 
 Rnosave code/R/resample_data.R -N RESAMPLE -t 5-200 -l mem_free=30G,h_vmem=30G
 Rnosave code/R/resample_data.R -J RESAMPLE --array=195-200 --mem=30G -o %x_%A_%a.out -e %x_%A_%a.err
@@ -32,6 +37,6 @@ Rnosave code/R/resample_data.R -J RESAMPLE --array=195-200 --mem=30G -o %x_%A_%a
 # Rnosave code/R/split_daily_minutely.R -N SPLIT -l mem_free=20G,h_vmem=21G
 Rnosave code/R/split_daily_minutely.R -J SPLIT --mem=21G
 
-Rnosave code/R/run_oak_verisense.R -N WALK -t 180-194 -l mem_free=51G,h_vmem=52G
+Rnosave code/R/run_oak_verisense.R -N WALK -t 119 -l mem_free=101G,h_vmem=102G
 Rnosave code/R/run_oak_verisense.R -J WALK --array=101-200 --mem=52G -o %x_%A_%a.out -e %x_%A_%a.err
 
