@@ -125,6 +125,8 @@ get_version_filenames = function(nhanes_version) {
       csv30_file = make_csv_name(paste0("csv_30", suffix),
                                  folder_name, id),
 
+      csv08_file = make_csv_name(paste0("csv_08", suffix),
+                                 folder_name, id),
       csv32_file = make_csv_name(paste0("csv_32", suffix),
                                  folder_name, id),
       csv64_file = make_csv_name(paste0("csv_64", suffix),
