@@ -17,7 +17,12 @@ if (!is.na(ifold)) {
     dplyr::filter(fold %in% ifold)
 }
 
-xdf = df
+# x = normalizePath(
+#   list.files(path = "data/acc_csv",
+#              full.names = TRUE,
+#              recursive = TRUE,
+#              pattern = ".csv")
+# )
 
 df = df %>%
   dplyr::filter(file.exists(csv_file))
