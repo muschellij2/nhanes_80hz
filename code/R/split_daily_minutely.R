@@ -76,14 +76,15 @@ write_individual_data(nh_table = "PAXDAY_G")
 write_individual_data(nh_table = "PAXDAY_H")
 write_individual_data(nh_table = "PAXDAY_Y")
 
+write_full_csv(nh_table = "PAXDAY_G")
+write_full_csv(nh_table = "PAXDAY_H")
+write_full_csv(nh_table = "PAXDAY_Y")
+
+
 write_individual_data(nh_table = "PAXMIN_G")
 write_individual_data(nh_table = "PAXMIN_H")
 write_individual_data(nh_table = "PAXMIN_Y")
 
-
-write_full_csv(nh_table = "PAXDAY_G")
-write_full_csv(nh_table = "PAXDAY_H")
-write_full_csv(nh_table = "PAXDAY_Y")
 
 write_full_csv(nh_table = "PAXMIN_G")
 write_full_csv(nh_table = "PAXMIN_H")
