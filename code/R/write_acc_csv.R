@@ -40,14 +40,15 @@ for (index in seq(max_n)) {
 
   if (!all(file.exists(unlist(files)))) {
     if (!file.exists(idf$acc_csv_file)) {
-      data = read_80hz(idf$csv_file)
+      data = read_80hz(idf$csv_file, progress = FALSE)
       data = data %>%
         dplyr::rename(time = any_of(c("HEADER_TIMESTAMP", "HEADER_TIME_STAMP")))
       write.gt3x::write_actigraph_csv(
         df = data,
         file = idf$acc_csv_file,
         sample_rate = 80L,
-        max_g = "8")
+        max_g = "8",
+        progress = FALSE)
       # doing this so .Last.value isn't maintained
       rm(data)
     }

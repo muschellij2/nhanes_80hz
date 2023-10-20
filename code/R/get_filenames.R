@@ -106,7 +106,7 @@ get_version_filenames = function(nhanes_version) {
       counts_1s_file = make_csv_name(paste0("counts_1s", suffix),
                                      folder_name, id),
       counts_60s_file = make_csv_name(paste0("counts_60s", suffix),
-                                     folder_name, id),
+                                      folder_name, id),
 
 
       counts_file = make_csv_name(paste0("counts", suffix),
@@ -116,7 +116,7 @@ get_version_filenames = function(nhanes_version) {
                                folder_name, id),
 
       acc_csv_file = make_csv_name(paste0("acc_csv", suffix),
-                               folder_name, id),
+                                   folder_name, id),
 
       csv15_file = make_csv_name(paste0("csv_15", suffix),
                                  folder_name, id),
@@ -146,6 +146,15 @@ get_version_filenames = function(nhanes_version) {
       adept_file = make_csv_name(paste0("adept", suffix),
                                  folder_name, id)
     )
+
+  df = df %>%
+    dplyr::mutate(
+      acc_steps_1s_file = make_csv_name(paste0("acc_steps_1s", suffix),
+                                     folder_name, paste0(id, "1sec")),
+      steps_1s_file = make_csv_name(paste0("steps_1s", suffix),
+                                     folder_name, id)
+    )
+
   df = df %>%
     dplyr::mutate(version = folder_name) %>%
     dplyr::select(version, id, url, tarball_file, filename,
