@@ -59,12 +59,15 @@ read_and_relabel = function(table, ...) {
     curl::curl_download(url, file)
   }
   df = haven::read_xpt(file, ...)
+  message(paste0("Read in ", basename(file)))
   table = normalize_table_name(table)
   nh_table = nh_table_name(table)
   translations = nhanesA::nhanesTranslate(
     nh_table = nh_table, data = NULL,
     colnames = colnames(df),
     nchar = 100)
+  message(paste0("Translated ", basename(file)))
+
   df = nhanesA::nhanesTranslate(nh_table = nh_table, data = df,
                                 colnames = colnames(df),
                                 nchar = 100)

@@ -8,16 +8,19 @@ get_fold = function() {
 }
 normalize_table_name = function(nh_table) {
   table = toupper(nh_table)
-  if (grepl("^Y", table)) {
-    table = sub("^Y_(.*)", "\\1_Y", table)
+
+  y_table = grepl("_Y$", table)
+  if (any(y_table)) {
+    table[y_table] = sub("^Y_(.*)", "\\1_Y", table[y_table])
   }
   table
 }
 
 nh_table_name = function(table) {
   nh_table = toupper(table)
-  if (grepl("_Y$", nh_table)) {
-    nh_table = sub("^(.*)_Y", "Y_\\1", nh_table)
+  y_table = grepl("_Y$", nh_table)
+  if (any(y_table)) {
+    nh_table[y_table] = sub("^(.*)_Y", "Y_\\1", nh_table[y_table])
   }
   nh_table
 }
@@ -32,10 +35,11 @@ nhanes_xpt_url = function(nh_table) {
   table = normalize_table_name(nh_table)
   nh_year <- nhanesA:::.get_year_from_nh_table(nh_table)
   base_url = "https://wwwn.cdc.gov/Nchs/"
-  if (grepl("^Y_", nh_table)) {
-    url <- paste0(base_url, nh_year, "/", nh_table, ".XPT")
-  } else {
-    url <- paste0(base_url,  "Nhanes", "/", nh_year, "/", nh_table, ".XPT")
+  y_table = grepl("^Y_", nh_table)
+  url <- paste0(base_url,  "Nhanes", "/", nh_year, "/", nh_table, ".XPT")
+  if (any(y_table)) {
+    url[y_table] <- paste0(base_url, nh_year[y_table],
+                           "/", nh_table[y_table], ".XPT")
   }
   url
 }
