@@ -14,6 +14,8 @@ xdf = df
 df = df %>%
   filter(!file.exists(steps_1s_file) & file.exists(acc_steps_1s_file))
 
+df = df %>%
+  filter(!id %in% c("78294"))
 # id is bad: 71917
 i = 1
 for (i in seq_len(nrow(df))) {

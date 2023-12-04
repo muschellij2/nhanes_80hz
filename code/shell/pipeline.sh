@@ -40,3 +40,6 @@ Rnosave code/R/split_daily_minutely.R -J SPLIT --mem=21G
 Rnosave code/R/run_oak_verisense.R -N WALK -t 119 -l mem_free=101G,h_vmem=102G
 Rnosave code/R/run_oak_verisense.R -J WALK --array=101-200 --mem=52G -o %x_%A_%a.out -e %x_%A_%a.err
 
+
+Rnosave code/R/write_steps_data.R -J STEPS --mem=20G -o %x_%A.out -e %x_%A.err
+
