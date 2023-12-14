@@ -21,7 +21,8 @@ df = x %>% clean_names()
 df = df %>%
   select(table, variable)
 df = df %>%
-  mutate(table = normalize_table_name(table))
+  mutate(table = normalize_table_name(table),
+         variable = toupper(variable))
 files = paste0("data/demographics/", df$table, ".XPT")
 stopifnot(all(file.exists(files)))
 
