@@ -42,6 +42,7 @@ read_and_relabel = function(
     table, ...,
     folder = "demographics",
     recode_vars = NULL,
+    subset_cols = NULL,
     nchar = 100
 ) {
   file = here::here("data", folder, paste0(table, ".XPT"))
@@ -50,6 +51,21 @@ read_and_relabel = function(
     curl::curl_download(url, file)
   }
   df = haven::read_xpt(file, ...)
+  df = tibble::as_tibble(df)
+
+  if (!is.null(subset_cols)) {
+    scols = intersect(colnames(df), subset_cols)
+    sd = setdiff(subset_cols, scols)
+    if (length(sd) > 0) {
+      msg = paste0("For table ", table,
+                   ", columns subset but not present: ",
+                   paste(sd, collapse = ", "))
+      message(msg)
+      warning(msg)
+    }
+    df = df[, scols, drop = FALSE]
+  }
+
   message(paste0("Read in ", basename(file)))
   table = normalize_table_name(table)
   nh_table = nh_table_name(table)
@@ -62,11 +78,11 @@ read_and_relabel = function(
   df = nhanesA::nhanesTranslate(nh_table = nh_table, data = df,
                                 colnames = colnames(df),
                                 nchar = nchar)
-  out = nhanes_crosscode_data(
-    table = table,
-    df = df,
-    translations = translations,
-    nchar = nchar)
+  # out = nhanes_crosscode_data(
+  #   table = table,
+  #   df = df,
+  #   translations = translations,
+  #   nchar = nchar)
   df = attach_translations(df, translations = translations)
   df = labels_to_colnames(df)
 
@@ -82,23 +98,34 @@ read_and_relabel = function(
       version = paste0("pax_", wave)
     )
   df = remake_labels(df)
-  df = tibble::as_tibble(df)
   df
 }
-waves = c("DEMO_G", "DEMO_H", "DEMO_Y")
-dfs = lapply(waves[1], read_and_relabel)
-names(dfs) = waves
-label_df = function(df) {
-  tibble::tibble(
-    new = colnames(df),
-    original = sapply(df, function(x) {
-      attr(x, "variable_name") %||% NA_character_
-    })
-  )
+
+all_files = readRDS("data/demographics/data_column_subsets.rds")
+
+itable = 1
+for (itable in seq_len(nrow(all_files))) {
+  idf = all_files[itable,]
+  table = idf$table
+  cols = unname(c(unlist(idf$data[[1]])))
+  out = read_and_relabel(table = table, subset_cols = cols)
 }
-get_col_from_label = function(df, label) {
-  labels = sapply(df, attr, "label")
-  df[, labels %in% label]
-}
-dplyr::bind_rows(dfs)
-label_df(dfs$DEMO_Y) %>% filter(new == "total_number_of_people_in_the_household")
+
+#
+# waves = c("DEMO_G", "DEMO_H", "DEMO_Y")
+# dfs = lapply(waves[1], read_and_relabel)
+# names(dfs) = waves
+# label_df = function(df) {
+#   tibble::tibble(
+#     new = colnames(df),
+#     original = sapply(df, function(x) {
+#       attr(x, "variable_name") %||% NA_character_
+#     })
+#   )
+# }
+# get_col_from_label = function(df, label) {
+#   labels = sapply(df, attr, "label")
+#   df[, labels %in% label]
+# }
+# dplyr::bind_rows(dfs)
+# label_df(dfs$DEMO_Y) %>% filter(new == "total_number_of_people_in_the_household")
