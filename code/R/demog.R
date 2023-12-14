@@ -5,35 +5,6 @@ library(rlang)
 source("code/R/utils.R")
 table = "DEMO_G"
 
-process_demog = function(df) {
-  if ("full_sample_2_year_mec_exam_weight" %in% colnames(df)) {
-    atr = attributes(df$full_sample_2_year_mec_exam_weight)
-    df = df %>%
-      dplyr::mutate(
-        full_sample_2_year_mec_exam_weight =
-          dplyr::if_else(full_sample_2_year_mec_exam_weight == 0,
-                         NA_real_,
-                         full_sample_2_year_mec_exam_weight)
-      )
-    attributes(df$full_sample_2_year_mec_exam_weight) = atr
-  }
-  if ("age_in_years_at_screening" %in% colnames(df) &&
-      is.numeric(df$age_in_years_at_screening)) {
-    atr = attributes(df$age_in_years_at_screening)
-    df = df %>%
-      dplyr::mutate(
-        age_in_years_at_screening =
-          ifelse(age_in_years_at_screening >= 80,
-                 "80 years of age and over",
-                 age_in_years_at_screening),
-        age_in_years_at_screening = factor(
-          age_in_years_at_screening,
-          levels = c(0:79,  "80 years of age and over"))
-      )
-    attributes(df$age_in_years_at_screening) = atr
-  }
-  df
-}
 
 attach_translations = function(df, translations) {
   cn = colnames(df)
@@ -52,8 +23,27 @@ labels_to_colnames = function(df) {
   df
 }
 
-read_and_relabel = function(table, ...) {
-  file = here::here("data", "demographics", paste0(table, ".XPT"))
+# apply the variable names as the label so that we can use View()
+# to see the original variable names
+remake_labels = function(df) {
+  for (icol in colnames(df)) {
+    x = df[[icol]]
+    label = attr(x, "label")
+    variable_name = attr(x, "variable_name")
+    attr(x, "label") = variable_name
+    attr(x, "full_label") = label
+    df[[icol]] = x
+  }
+  df
+}
+
+read_and_relabel = function(
+    table, ...,
+    folder = "demographics",
+    recode_vars = NULL,
+    nchar = 100
+) {
+  file = here::here("data", folder, paste0(table, ".XPT"))
   if (!file.exists(file)) {
     url = nhanes_xpt_url(table)
     curl::curl_download(url, file)
@@ -65,35 +55,17 @@ read_and_relabel = function(table, ...) {
   translations = nhanesA::nhanesTranslate(
     nh_table = nh_table, data = NULL,
     colnames = colnames(df),
-    nchar = 100)
+    nchar = nchar)
   message(paste0("Translated ", basename(file)))
 
   df = nhanesA::nhanesTranslate(nh_table = nh_table, data = df,
                                 colnames = colnames(df),
-                                nchar = 100)
-  recode_vars = NULL
-  if (table == "DEMO_G") {
-    recode_vars = c("DMDHHSIZ", "DMDFMSIZ", "DMDHHSZA",
-                    "DMDHHSZB", "DMDHHSZE", "RIDAGEYR")
-  } else if (table == "DEMO_Y") {
-    recode_vars = c("DMDHHSIZ")
-  }
-  if (!is.null(recode_vars)) {
-    # cross coding!
-    df = nhanesA::nhanesTranslate(
-      nh_table = "DEMO_H",
-      data = df,
-      colnames = recode_vars,
-      nchar = 100)
-    translations[names(translations) %in% recode_vars] = NULL
-    tt = nhanesA::nhanesTranslate(
-      nh_table = "DEMO_H",
-      data = df,
-      colnames = recode_vars,
-      nchar = 100)
-    translations = c(translations, tt)
-  }
-
+                                nchar = nchar)
+  out = recode_demog(
+    table = table,
+    df = df,
+    translations = translations,
+    nchar = nchar)
   df = attach_translations(df, translations = translations)
   df = labels_to_colnames(df)
 
@@ -106,11 +78,12 @@ read_and_relabel = function(table, ...) {
       wave = get_wave(nh_table),
       version = paste0("pax_", wave)
     )
+  df = remake_labels(df)
   df = tibble::as_tibble(df)
   df
 }
 waves = c("DEMO_G", "DEMO_H", "DEMO_Y")
-dfs = lapply(waves, read_and_relabel)
+dfs = lapply(waves[1], read_and_relabel)
 names(dfs) = waves
 label_df = function(df) {
   tibble::tibble(
