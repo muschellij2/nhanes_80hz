@@ -9,7 +9,7 @@ get_fold = function() {
 normalize_table_name = function(nh_table) {
   table = toupper(nh_table)
 
-  y_table = grepl("_Y$", table)
+  y_table = grepl("^Y_", table)
   if (any(y_table)) {
     table[y_table] = sub("^Y_(.*)", "\\1_Y", table[y_table])
   }

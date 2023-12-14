@@ -3,6 +3,7 @@ library(dplyr)
 library(nhanesA)
 library(rlang)
 source("code/R/utils.R")
+source("code/R/nhanes_cross_code.R")
 table = "DEMO_G"
 
 
@@ -61,7 +62,7 @@ read_and_relabel = function(
   df = nhanesA::nhanesTranslate(nh_table = nh_table, data = df,
                                 colnames = colnames(df),
                                 nchar = nchar)
-  out = recode_demog(
+  out = nhanes_crosscode_data(
     table = table,
     df = df,
     translations = translations,
@@ -70,7 +71,9 @@ read_and_relabel = function(
   df = labels_to_colnames(df)
 
   norm_table = normalize_table_name(nh_table)
-  df = process_demog(df)
+  if (any(grepl("DEMO", nh_table))) {
+    df = process_demog(df)
+  }
   df = df %>%
     dplyr::mutate(
       nh_table = table,

@@ -42,7 +42,9 @@ cross_code_list = list(
 )
 
 nhanes_crosscode = function(
-    df, translations, recode_nh_table = "DEMO_H",
+    df,
+    translations,
+    recode_nh_table = "DEMO_H",
     recode_vars = NULL,
     nchar = 100) {
   if (!is.null(recode_vars)) {
@@ -66,7 +68,8 @@ nhanes_crosscode = function(
        translations = translations)
 }
 
-recode_demog = function(table, df, translations, nchar = 100) {
+
+nhanes_crosscode_data = function(table, df, translations, nchar = 100) {
   stopifnot(table %in% names(cross_code_list))
   out = cross_code_list[[table]]
   recode_nh_table = out$recode_nh_table
