@@ -27,3 +27,5 @@ write_gt3x.R
 adept_test.R
 comparison.R
 fast_running_cross.R
+stepcount_models
+stepcount_data
