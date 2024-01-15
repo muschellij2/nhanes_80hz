@@ -34,7 +34,9 @@ if (!is.na(ifold)) {
 i = 1
 for (i in seq_len(nrow(df))) {
   idf = df[i,]
+  print(paste0(i, " of ", nrow(df)))
   file = idf[[csv_col]]
+  print(file)
   data = read_80hz(file, progress = FALSE)
 
   out = stepcount(data, model_path = model_path, model_type = model_type)
