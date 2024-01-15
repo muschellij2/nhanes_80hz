@@ -34,7 +34,7 @@ if (!is.na(ifold)) {
 i = 1
 for (i in seq_len(nrow(df))) {
   idf = df[i,]
-  file = idf$csv_file
+  file = idf[[csv_col]]
   data = read_80hz(file, progress = FALSE)
 
   out = stepcount(data, model_path = model_path, model_type = model_type)
@@ -59,5 +59,5 @@ for (i in seq_len(nrow(df))) {
   result = dplyr::full_join(out$steps, out$walking)
   result = result %>%
     dplyr::mutate(non_wear = is.na(steps) & is.na(walking))
-  readr::write_csv(result, idf[[]])
+  readr::write_csv(result, idf[[stepcount_col]])
 }
