@@ -56,8 +56,10 @@ for (i in seq_len(nrow(df))) {
   #   dplyr::summarise(
   #     non_wear = any(na_x)
   #   )
+  stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
   result = dplyr::full_join(out$steps, out$walking)
   result = result %>%
-    dplyr::mutate(non_wear = is.na(steps) & is.na(walking))
-  readr::write_csv(result, idf[[stepcount_col]])
+    dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
+                  walking = walking > 0)
+  write_csv_gz(result, idf[[stepcount_col]])
 }
