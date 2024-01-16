@@ -36,6 +36,7 @@ for (i in seq_len(nrow(df))) {
   idf = df[i,]
   print(paste0(i, " of ", nrow(df)))
   file = idf[[csv_col]]
+  dir.create(dirname(file), showWarnings = FALSE, recursive = TRUE)
   print(file)
   data = read_80hz(file, progress = FALSE)
 
