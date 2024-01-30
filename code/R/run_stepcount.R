@@ -20,9 +20,9 @@ if (!file.exists(model_path)) {
 }
 sample_rate = 30L
 stepcount_col = ifelse(sample_rate != 80L, "stepcount_file",
-                paste0("stepcount", sample_rate, "_file"))
+                       paste0("stepcount", sample_rate, "_file"))
 csv_col = ifelse(sample_rate != 80L, "csv_file",
-                       paste0("csv", sample_rate, "_file"))
+                 paste0("csv", sample_rate, "_file"))
 
 ifold = get_fold()
 
@@ -39,30 +39,31 @@ for (i in seq_len(nrow(df))) {
   dir.create(dirname(file), showWarnings = FALSE, recursive = TRUE)
   print(file)
   data = read_80hz(file, progress = FALSE)
+  if (!file.exists(idf[[stepcount_col]])) {
+    out = stepcount(data, model_path = model_path, model_type = model_type)
+    rm(list = "data")
+    info = tibble::as_tibble(out$info)
+    info = janitor::clean_names(info)
+    info$filename = file
 
-  out = stepcount(data, model_path = model_path, model_type = model_type)
-  rm(list = "data")
-  info = tibble::as_tibble(out$info)
-  info = janitor::clean_names(info)
-  info$filename = file
-
-  # nonwear = out$processed_data
-  # nonwear = reticulate::py_to_r(nonwear)
-  # times = attr(nonwear, "pandas.index")
-  # times = reticulate::py_to_r(times$values)
-  # nonwear$time = times
-  # nonwear = data %>%
-  #   dplyr::mutate(
-  #     na_x = is.na(x),
-  #     time = lubridate::floor_date(time, "10 second")) %>%
-  #   dplyr::group_by(time) %>%
-  #   dplyr::summarise(
-  #     non_wear = any(na_x)
-  #   )
-  stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
-  result = dplyr::full_join(out$steps, out$walking)
-  result = result %>%
-    dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
-                  walking = walking > 0)
-  write_csv_gz(result, idf[[stepcount_col]])
+    # nonwear = out$processed_data
+    # nonwear = reticulate::py_to_r(nonwear)
+    # times = attr(nonwear, "pandas.index")
+    # times = reticulate::py_to_r(times$values)
+    # nonwear$time = times
+    # nonwear = data %>%
+    #   dplyr::mutate(
+    #     na_x = is.na(x),
+    #     time = lubridate::floor_date(time, "10 second")) %>%
+    #   dplyr::group_by(time) %>%
+    #   dplyr::summarise(
+    #     non_wear = any(na_x)
+    #   )
+    stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
+    result = dplyr::full_join(out$steps, out$walking)
+    result = result %>%
+      dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
+                    walking = walking > 0)
+    write_csv_gz(result, idf[[stepcount_col]])
+  }
 }

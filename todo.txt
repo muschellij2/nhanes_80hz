@@ -1,0 +1,8 @@
+# script must read in acc_csv (rename test)
+# should we keep 1sec in there?  I think yes
+# Then compare to counts_1s file - make sure all rows there (except maybe last)
+# compare the values themselves
+# call columns "steps"
+# rename test_acc_csv to actilife_counts_1s
+# create a actilife_steps_1s with the data (should it be steps and counts or just counts?)
+# ask the group
