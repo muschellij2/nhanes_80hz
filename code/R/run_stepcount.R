@@ -19,9 +19,9 @@ if (!file.exists(model_path)) {
   model_path = NULL
 }
 sample_rate = 80L
-stepcount_col = ifelse(sample_rate != 80L, "stepcount_file",
+stepcount_col = ifelse(sample_rate == 80L, "stepcount_file",
                        paste0("stepcount", sample_rate, "_file"))
-csv_col = ifelse(sample_rate != 80L, "csv_file",
+csv_col = ifelse(sample_rate == 80L, "csv_file",
                  paste0("csv", sample_rate, "_file"))
 
 ifold = get_fold()
