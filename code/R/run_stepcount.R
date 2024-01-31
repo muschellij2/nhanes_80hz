@@ -21,6 +21,9 @@ if (!file.exists(model_path)) {
 sample_rate = 80L
 stepcount_col = ifelse(sample_rate == 80, "stepcount_file",
                        paste0("stepcount", sample_rate, "_file"))
+stepcount_col = ifelse(model_type != "ssl",
+                       paste0(model_type, "_", stepcount_col),
+                       stepcount_col)
 csv_col = ifelse(sample_rate == 80, "csv_file",
                  paste0("csv", sample_rate, "_file"))
 
