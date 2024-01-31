@@ -13,8 +13,13 @@ rm(list = c("fold"))
 df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 xdf = df
 
-model_path = here::here("stepcount_models/ssl-20230208.joblib.lzma")
 model_type = "ssl"
+model_filename = sc_model_filename(model_type)
+model_path = switch(
+  model_type,
+  ssl = model_filename,
+  rf = paste0("rf-", model_filename))
+model_path = here::here("stepcount_models", model_path)
 if (!file.exists(model_path)) {
   model_path = NULL
 }
@@ -41,8 +46,8 @@ for (i in seq_len(nrow(df))) {
   file = idf[[csv_col]]
   dir.create(dirname(file), showWarnings = FALSE, recursive = TRUE)
   print(file)
-  data = read_80hz(file, progress = FALSE)
   if (!file.exists(idf[[stepcount_col]])) {
+    data = read_80hz(file, progress = FALSE)
     out = stepcount(data, model_path = model_path, model_type = model_type)
     rm(list = "data")
     info = tibble::as_tibble(out$info)
