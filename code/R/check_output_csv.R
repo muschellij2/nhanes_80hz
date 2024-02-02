@@ -10,7 +10,7 @@ df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 xdf = df
 
 ifold = get_fold()
-if (!is.na(ifold)) {
+if (!any(is.na(ifold))) {
   df = df %>%
     dplyr::filter(fold %in% ifold)
 }
