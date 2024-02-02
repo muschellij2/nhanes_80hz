@@ -81,6 +81,7 @@ check_time_diffs = function(time, sample_rate = 80) {
   eps = 0.000001
   assertthat::assert_that(
     all(dtime > 0),
+    all(dtime < 1),
     mdtime <= (1/sample_rate + eps)
   )
 }
