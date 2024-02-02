@@ -13,7 +13,7 @@ rm(list = c("fold"))
 df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 xdf = df
 
-model_type = "ssl"
+model_type = "rf"
 model_filename = sc_model_filename(model_type)
 model_path = switch(
   model_type,
