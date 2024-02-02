@@ -99,3 +99,4 @@ read_daily_min = function(nh_table, ...) {
   }
   df
 }
+

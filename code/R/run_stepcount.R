@@ -47,8 +47,9 @@ for (i in seq_len(nrow(df))) {
   dir.create(dirname(file), showWarnings = FALSE, recursive = TRUE)
   print(file)
   if (!file.exists(idf[[stepcount_col]])) {
-    data = read_80hz(file, progress = FALSE)
-    out = stepcount(data, model_path = model_path, model_type = model_type)
+    # data = read_80hz(file, progress = FALSE)
+    run_file = rename_xyzt(file)
+    out = stepcount(run_file, model_path = model_path, model_type = model_type)
     rm(list = "data")
     info = tibble::as_tibble(out$info)
     info = janitor::clean_names(info)

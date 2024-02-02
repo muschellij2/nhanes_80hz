@@ -613,6 +613,43 @@ make_flag_df = function(id, version, ...) {
 
 
 
+
+filetype <- function(path){
+  f = file(path)
+  ext = summary(f)$class
+  close.connection(f)
+  ext
+}
+is_gzip = function(path) {
+  filetype(path) %in% c("gzfile", "xzfile", "bzfile")
+}
+
+
+rename_xyzt = function(csv_file) {
+  tfile = tempfile(fileext = ".csv")
+  if (is_gzip(csv_file)) {
+    R.utils::gunzip(csv_file, destname = tfile, remove = FALSE)
+  } else {
+    file.copy(csv_file, tfile)
+  }
+  qtfile = shQuote(tfile)
+  # cmd = paste0("zcat ", shQuote(csv_file), " > ", qtfile)
+  # system(cmd)
+  cmd = paste0("sed -i '1s/HEADER_TIMESTAMP/time/' ", qtfile)
+  system(cmd)
+  cmd = paste0("sed -i '1s/X/x/' ", qtfile)
+  system(cmd)
+  cmd = paste0("sed -i '1s/Y/y/' ", qtfile)
+  system(cmd)
+  cmd = paste0("sed -i '1s/Z/z/' ", qtfile)
+  system(cmd)
+  cmd = paste0("sed -i 's/T/ /' ", qtfile)
+  system(cmd)
+  cmd = paste0("sed -i 's/Z//' ", qtfile)
+  system(cmd)
+  return(tfile)
+}
+
 summarise_nhanes_80hz = function(
     csv_file,
     log_file,
