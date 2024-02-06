@@ -13,16 +13,22 @@ rm(list = c("fold"))
 df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 xdf = df
 
-model_type = "ssl"
-model_filename = sc_model_filename(model_type)
-model_path = switch(
-  model_type,
-  ssl = model_filename,
-  rf = paste0("rf-", model_filename))
-model_path = here::here("stepcount_models", model_path)
-if (!file.exists(model_path)) {
-  model_path = NULL
+model_path_by_type = function(model_type) {
+  model_filename = sc_model_filename(model_type)
+  model_path = switch(
+    model_type,
+    ssl = model_filename,
+    rf = paste0("rf-", model_filename))
+  model_path = here::here("stepcount_models", model_path)
+  if (!file.exists(model_path)) {
+    model_path = NULL
+  }
+  model_path
 }
+
+model_type = "rf"
+model_path = model_path_by_type(model_type)
+
 sample_rate = 80L
 stepcount_col = ifelse(sample_rate == 80, "stepcount_file",
                        paste0("stepcount", sample_rate, "_file"))
