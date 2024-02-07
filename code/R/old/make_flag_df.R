@@ -115,21 +115,20 @@ for (ifile in seq(nrow(wide))) {
     # df = read_80hz(csv_file)
     # file.remove(csv_file)
     # df = df %>%
-    #   dplyr::select(HEADER_TIMESTAMP) %>%
-    #   dplyr::rename(HEADER_TIME_STAMP = HEADER_TIMESTAMP)
+    #   dplyr::select(HEADER_TIMESTAMP)
     # df = df %>%
-    #   dplyr::mutate(HEADER_TIME_STAMP =
-    # SummarizedActigraphy:::floor_sec(HEADER_TIME_STAMP)) %>%
+    #   dplyr::mutate(HEADER_TIMESTAMP =
+    # SummarizedActigraphy:::floor_sec(HEADER_TIMESTAMP)) %>%
     #   dplyr::distinct()
     df = tibble::tibble(
-      HEADER_TIME_STAMP =
+      HEADER_TIMESTAMP =
         seq(SummarizedActigraphy:::floor_sec(idf$start_time),
             SummarizedActigraphy:::floor_sec(idf$stop_time),
             by = "1 sec"))
-    min_day = min(df$HEADER_TIME_STAMP)
+    min_day = min(df$HEADER_TIMESTAMP)
     min_day = lubridate::floor_date(min_day, unit = "days")
     min_day = lubridate::as_date(min_day)
-    rdf = range(df$HEADER_TIME_STAMP)
+    rdf = range(df$HEADER_TIMESTAMP)
     flags = matrix(0, nrow = nrow(df), ncol = length(flag_types))
     colnames(flags) = flag_types
     flags = tibble::as_tibble(flags)
@@ -170,7 +169,7 @@ for (ifile in seq(nrow(wide))) {
         start_dt = log$start_dt[i]
         end_dt = log$end_dt[i]
         times = seq(start_dt, end_dt, by = 1)
-        rows = flags$HEADER_TIME_STAMP %in% times
+        rows = flags$HEADER_TIMESTAMP %in% times
         flags[rows, flag_code] = flags[rows, flag_code] +
           rep(log$data_quality_flag_value[i], length = length(rows))
         if (i %% 1000 == 0) print(i)

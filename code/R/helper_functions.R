@@ -529,9 +529,9 @@ make_flag_df = function(id, version, ...) {
   # See if flag exists
   ################################################
   df = tibble::tibble(
-    HEADER_TIME_STAMP = all_minutes
+    HEADER_TIMESTAMP = all_minutes
   )
-  min_day = min(df$HEADER_TIME_STAMP)
+  min_day = min(df$HEADER_TIMESTAMP)
   min_day = lubridate::floor_date(min_day, unit = "days")
   min_day = lubridate::as_date(min_day)
 
@@ -543,7 +543,7 @@ make_flag_df = function(id, version, ...) {
   if (nrow(log) > 0) {
 
     flags = flags %>%
-      tidyr::gather(flag, value = value, -HEADER_TIME_STAMP) %>%
+      tidyr::gather(flag, value = value, -HEADER_TIMESTAMP) %>%
       select(-value)
 
 
@@ -578,7 +578,7 @@ make_flag_df = function(id, version, ...) {
     log_df = mapply(function(start, end, flag) {
       times = seq(start, end, by = 60L)
       ddf = tibble::tibble(
-        HEADER_TIME_STAMP = times,
+        HEADER_TIMESTAMP = times,
         flag = flag,
         value = TRUE
       )

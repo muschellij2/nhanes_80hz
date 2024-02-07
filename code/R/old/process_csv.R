@@ -140,21 +140,19 @@ process_csv = function(id, measure_1min_bqt) {
       #   verbose = 2)
       # res = res %>%
       #   mutate(AC = sqrt((X^2 +Y^2 + Z^2)/3)) %>%
-      #   select(HEADER_TIME_STAMP, AC)
+      #   select(HEADER_TIMESTAMP, AC)
 
 
       frac_seconds = as.numeric(dat$HEADER_TIMESTAMP) %% 1
       stopifnot(any(frac_seconds > 0))
       rm(frac_seconds)
-      dat = dat %>%
-        rename(HEADER_TIME_STAMP = HEADER_TIMESTAMP)
       print("renaming header")
       print_memory()
 
 
       # Add to database!!!
       stopifnot(
-        lubridate::is.POSIXct(dat$HEADER_TIME_STAMP)
+        lubridate::is.POSIXct(dat$HEADER_TIMESTAMP)
       )
 
       check_csv = function(time, start_time, stop_time) {
@@ -192,7 +190,7 @@ process_csv = function(id, measure_1min_bqt) {
         gc()
         return(TRUE)
       }
-      check_csv(time = dat$HEADER_TIME_STAMP, start_time, stop_time)
+      check_csv(time = dat$HEADER_TIMESTAMP, start_time, stop_time)
       print_memory()
 
       # message("Uploading Full data")
@@ -224,9 +222,9 @@ process_csv = function(id, measure_1min_bqt) {
       rm(dat)
       print_memory()
       measures = tibble::as_tibble(measures)
-      if (!"HEADER_TIME_STAMP" %in% colnames(measures)) {
+      if (!"HEADER_TIMESTAMP" %in% colnames(measures)) {
         measures = measures %>%
-          dplyr::rename(HEADER_TIME_STAMP = time)
+          dplyr::rename(HEADER_TIMESTAMP = time)
       }
       print_memory()
 
