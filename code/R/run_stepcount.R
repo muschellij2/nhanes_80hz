@@ -56,7 +56,8 @@ for (i in seq_len(nrow(df))) {
     # data = read_80hz(file, progress = FALSE)
     run_file = rename_xyzt(file)
     out = stepcount(run_file, model_path = model_path, model_type = model_type)
-    rm(list = "data")
+    # rm(list = "data")
+    file.remove(run_file)
     info = tibble::as_tibble(out$info)
     info = janitor::clean_names(info)
     info$filename = file
