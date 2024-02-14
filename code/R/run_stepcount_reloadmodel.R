@@ -38,9 +38,6 @@ stepcount_col = ifelse(model_type != "ssl",
 csv_col = ifelse(sample_rate == 80, "csv_file",
                  paste0("csv", sample_rate, "_file"))
 
-model = sc_load_model(model_type = model_type,
-                      model_path = model_path,
-                      as_python = TRUE)
 ifold = get_fold()
 
 if (!is.na(ifold)) {
@@ -58,9 +55,7 @@ for (i in seq_len(nrow(df))) {
   if (!file.exists(idf[[stepcount_col]])) {
     # data = read_80hz(file, progress = FALSE)
     run_file = rename_xyzt(file)
-    out = stepcount_with_model(file = run_file,
-                               model = model,
-                               model_type = model_type)
+    out = stepcount(run_file, model_path = model_path, model_type = model_type)
     # rm(list = "data")
     file.remove(run_file)
     info = tibble::as_tibble(out$info)
