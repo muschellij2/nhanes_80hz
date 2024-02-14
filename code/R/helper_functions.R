@@ -625,7 +625,7 @@ is_gzip = function(path) {
 }
 
 
-rename_xyzt = function(csv_file) {
+rename_xyzt_old = function(csv_file, verbose = TRUE) {
   tfile = tempfile(fileext = ".csv")
   if (is_gzip(csv_file)) {
     R.utils::gunzip(csv_file, destname = tfile, remove = FALSE)
@@ -635,20 +635,66 @@ rename_xyzt = function(csv_file) {
   qtfile = shQuote(tfile)
   # cmd = paste0("zcat ", shQuote(csv_file), " > ", qtfile)
   # system(cmd)
+  if (verbose) {
+    message("renaming HEADER_TIMESTAMP")
+  }
   cmd = paste0("sed -ibak '1s/HEADER_TIMESTAMP/time/' ", qtfile)
   system(cmd)
+  if (verbose) {
+    message("renaming 1X")
+  }
   cmd = paste0("sed -ibak '1s/X/x/' ", qtfile)
   system(cmd)
+  if (verbose) {
+    message("renaming 1Y")
+  }
   cmd = paste0("sed -ibak '1s/Y/y/' ", qtfile)
   system(cmd)
+  if (verbose) {
+    message("renaming 1Z")
+  }
   cmd = paste0("sed -ibak '1s/Z/z/' ", qtfile)
   system(cmd)
+  if (verbose) {
+    message("removing T")
+  }
   cmd = paste0("sed -ibak 's/T/ /' ", qtfile)
   system(cmd)
+  if (verbose) {
+    message("removing Z")
+  }
   cmd = paste0("sed -ibak 's/Z//' ", qtfile)
   system(cmd)
   return(tfile)
 }
+
+rename_xyzt = function(csv_file, verbose = TRUE) {
+  tfile = tempfile(fileext = ".csv")
+  if (is_gzip(csv_file)) {
+    R.utils::gunzip(csv_file, destname = tfile, remove = FALSE)
+  } else {
+    file.copy(csv_file, tfile)
+  }
+  qtfile = shQuote(tfile)
+  all_expressions = c("-e '1s/HEADER_TIMESTAMP/time/'",
+                      "-e '1s/X/x/'",
+                      "-e '1s/Y/y/'",
+                      "-e '1s/Z/z/'",
+                      "-e 's/T/ /'",
+                      "-e 's/Z//'")
+  all_expressions = paste(all_expressions, collapse = " ")
+  cmd = paste0("sed -ibak ", all_expressions, " ", qtfile)
+  if (verbose) {
+    message("Renaming header/T/Z")
+  }
+  result = system(cmd)
+  if (verbose) {
+    message("Result is ", result)
+  }
+  stopifnot(result == 0)
+  return(tfile)
+}
+
 
 summarise_nhanes_80hz = function(
     csv_file,
