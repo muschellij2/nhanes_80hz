@@ -668,13 +668,14 @@ rename_xyzt_old = function(csv_file, verbose = TRUE) {
   return(tfile)
 }
 
-rename_xyzt = function(csv_file, verbose = TRUE) {
-  tfile = tempfile(fileext = ".csv")
+rename_xyzt = function(csv_file, verbose = TRUE, tmpdir = tempdir()) {
+  tfile = tempfile(fileext = ".csv", tmpdir = tmpdir)
   if (is_gzip(csv_file)) {
     R.utils::gunzip(csv_file, destname = tfile, remove = FALSE)
   } else {
     file.copy(csv_file, tfile)
   }
+  backup_ext = "bak"
   qtfile = shQuote(tfile)
   all_expressions = c("-e '1s/HEADER_TIMESTAMP/time/'",
                       "-e '1s/X/x/'",
@@ -683,13 +684,17 @@ rename_xyzt = function(csv_file, verbose = TRUE) {
                       "-e 's/T/ /'",
                       "-e 's/Z//'")
   all_expressions = paste(all_expressions, collapse = " ")
-  cmd = paste0("sed -ibak ", all_expressions, " ", qtfile)
+  cmd = paste0("sed -i", backup_ext, " ", all_expressions, " ", qtfile)
   if (verbose) {
     message("Renaming header/T/Z")
   }
   result = system(cmd)
   if (verbose) {
     message("Result is ", result)
+  }
+  backup_ext = gsub("'", "", backup_ext)
+  if (nchar(backup_ext) > 0) {
+    suppressWarnings(file.remove(paste0(tfile, backup_ext)))
   }
   stopifnot(result == 0)
   return(tfile)

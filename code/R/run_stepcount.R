@@ -57,7 +57,8 @@ for (i in seq_len(nrow(df))) {
   print(file)
   if (!file.exists(idf[[stepcount_col]])) {
     # data = read_80hz(file, progress = FALSE)
-    run_file = rename_xyzt(file)
+    # may need to set tmpdir to Sys.getenv("MYSCRATCH") to get around file
+    run_file = rename_xyzt(file, tmpdir = tempdir())
     out = stepcount_with_model(file = run_file,
                                model = model,
                                model_type = model_type)
