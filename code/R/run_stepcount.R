@@ -64,6 +64,7 @@ for (i in seq_len(nrow(df))) {
                                model_type = model_type)
     # rm(list = "data")
     file.remove(run_file)
+    file.remove(paste0(run_file, "bak"))
     info = tibble::as_tibble(out$info)
     info = janitor::clean_names(info)
     info$filename = file
