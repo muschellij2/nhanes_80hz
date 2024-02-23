@@ -26,21 +26,29 @@ model_path_by_type = function(model_type) {
   model_path
 }
 
-model_type = "rf"
-model_path = model_path_by_type(model_type)
-
+model_types = c("ssl", "rf")
 sample_rate = 80L
-stepcount_col = ifelse(sample_rate == 80, "stepcount_file",
-                       paste0("stepcount", sample_rate, "_file"))
-stepcount_col = ifelse(model_type != "ssl",
-                       paste0(model_type, "_", stepcount_col),
-                       stepcount_col)
 csv_col = ifelse(sample_rate == 80, "csv_file",
                  paste0("csv", sample_rate, "_file"))
 
-model = sc_load_model(model_type = model_type,
-                      model_path = model_path,
-                      as_python = TRUE)
+
+stepcount_cols = sapply(model_types, function(model_type) {
+  stepcount_col = ifelse(sample_rate == 80, "stepcount_file",
+                         paste0("stepcount", sample_rate, "_file"))
+  stepcount_col = ifelse(model_type != "ssl",
+                         paste0(model_type, "_", stepcount_col),
+                         stepcount_col)
+  stepcount_col
+})
+
+# Load the models
+models = lapply(model_types, function(model_type) {
+  model_path = model_path_by_type(model_type)
+  sc_load_model(model_type = model_type,
+                model_path = model_path,
+                as_python = TRUE)
+})
+
 ifold = get_fold()
 
 if (!is.na(ifold)) {
@@ -49,44 +57,36 @@ if (!is.na(ifold)) {
 }
 
 i = 1
+
 for (i in seq_len(nrow(df))) {
   idf = df[i,]
   print(paste0(i, " of ", nrow(df)))
   file = idf[[csv_col]]
   dir.create(dirname(file), showWarnings = FALSE, recursive = TRUE)
   print(file)
-  if (!file.exists(idf[[stepcount_col]])) {
-    # data = read_80hz(file, progress = FALSE)
-    # may need to set tmpdir to Sys.getenv("MYSCRATCH") to get around file
+  stepcount_outfiles = unlist(idf[,stepcount_cols])
+  names(stepcount_outfiles) = model_types
+  if (!all(file.exists(stepcount_outfiles))) {
     run_file = rename_xyzt(file, tmpdir = tempdir())
-    out = stepcount_with_model(file = run_file,
-                               model = model,
-                               model_type = model_type)
-    # rm(list = "data")
-    file.remove(run_file)
-    file.remove(paste0(run_file, "bak"))
-    info = tibble::as_tibble(out$info)
-    info = janitor::clean_names(info)
-    info$filename = file
 
-    # nonwear = out$processed_data
-    # nonwear = reticulate::py_to_r(nonwear)
-    # times = attr(nonwear, "pandas.index")
-    # times = reticulate::py_to_r(times$values)
-    # nonwear$time = times
-    # nonwear = data %>%
-    #   dplyr::mutate(
-    #     na_x = is.na(x),
-    #     time = lubridate::floor_date(time, "10 second")) %>%
-    #   dplyr::group_by(time) %>%
-    #   dplyr::summarise(
-    #     non_wear = any(na_x)
-    #   )
-    stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
-    result = dplyr::full_join(out$steps, out$walking)
-    result = result %>%
-      dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
-                    walking = walking > 0)
-    write_csv_gz(result, idf[[stepcount_col]])
+    for (model_type in model_types) {
+      model = models[[model_type]]
+      stepcount_col = stepcount_cols[model_type]
+      out = stepcount_with_model(file = run_file,
+                                 model = model,
+                                 model_type = model_type)
+      file.remove(run_file)
+      file.remove(paste0(run_file, "bak"))
+      info = tibble::as_tibble(out$info)
+      info = janitor::clean_names(info)
+      info$filename = file
+
+      stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
+      result = dplyr::full_join(out$steps, out$walking)
+      result = result %>%
+        dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
+                      walking = walking > 0)
+      write_csv_gz(result, idf[[stepcount_col]])
+    }
   }
 }

@@ -96,3 +96,13 @@ For processing data, the order of operations is:
     [`actilifecounts`](https://github.com/jhmigueles/actilifecounts)
     have different implementations, all aiming at reproducing counts as
     laid out in <https://github.com/actigraph/agcounts>.
+
+## `stepcount`
+
+Version of `stepcount` used was 3.2.4. Please see
+`nhanes_80hz_stepcount.yml` for the YAML to create the `stepcount` conda
+environment:
+
+``` bash
+conda create -f nhanes_80hz_stepcount.yml
+```
