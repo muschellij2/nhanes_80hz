@@ -91,7 +91,9 @@ for (i in seq_len(nrow(df))) {
         write_csv_gz(result, idf[[stepcount_col]])
       }
     }
-    file.remove(run_file)
-    file.remove(paste0(run_file, "bak"))
+    suppressWarnings({
+      file.remove(run_file)
+      file.remove(paste0(run_file, "bak"))
+    })
   }
 }
