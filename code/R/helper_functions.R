@@ -705,9 +705,10 @@ summarise_nhanes_80hz = function(
     csv_file,
     log_file,
     meta_file,
-    counts_file,
+    counts_file = NULL,
     measures_file,
     summary_meta_file = NULL,
+    calculate_mims = FALSE,
     sample_rate = 80L,
     dynamic_range = c(-6L, 6L),
     num_threads = 1L,
@@ -731,14 +732,19 @@ summarise_nhanes_80hz = function(
   df = read_80hz(csv_file, num_threads = num_threads)
   print(head(df))
 
-  id_meta_df = readr::read_csv(meta_file, num_threads = num_threads)
-  meta_df = summarize_meta_df(id_meta_df, raw = NULL)
-  rtime = range(df$HEADER_TIMESTAMP, na.rm = TRUE)
-  meta_df$start_time = as.character(rtime[1])
-  meta_df$stop_time = as.character(rtime[2])
-  meta_df$id = id
-  meta_df = meta_df %>%
-    dplyr::select(id, dplyr::everything())
+  if (!is.null(meta_file)) {
+    id_meta_df = readr::read_csv(meta_file, num_threads = num_threads)
+    meta_df = summarize_meta_df(id_meta_df, raw = NULL)
+    rtime = range(df$HEADER_TIMESTAMP, na.rm = TRUE)
+    meta_df$start_time = as.character(rtime[1])
+    meta_df$stop_time = as.character(rtime[2])
+    meta_df$id = id
+    meta_df = meta_df %>%
+      dplyr::select(id, dplyr::everything())
+  } else {
+    id_meta_df = NULL
+    meta_df = NULL
+  }
 
   # run quick checks
   # Add to database!!!
@@ -756,7 +762,7 @@ summarise_nhanes_80hz = function(
       fill_in = FALSE,
       trim = FALSE,
       dynamic_range = dynamic_range,
-      calculate_mims = FALSE,
+      calculate_mims = calculate_mims,
       flag_data = FALSE,
       sample_rate = sample_rate,
       verbose = verbose > 0)
@@ -775,22 +781,26 @@ summarise_nhanes_80hz = function(
   rm(df)
   for (i in 1:10) gc()
 
-  # From muschellij2/agcounter
-  counts = agcounter::convert_counts_csv(
-    csv_file,
-    outfile = counts_file,
-    sample_rate = sample_rate,
-    epoch_in_seconds = 60L,
-    verbose = 2,
-    time_column = "HEADER_TIMESTAMP")
+  if (!is.null(counts_file)) {
+    # From muschellij2/agcounter
+    counts = agcounter::convert_counts_csv(
+      csv_file,
+      outfile = counts_file,
+      sample_rate = sample_rate,
+      epoch_in_seconds = 60L,
+      verbose = 2,
+      time_column = "HEADER_TIMESTAMP")
 
-  counts$id = id
-  counts = counts %>%
-    dplyr::select(id, dplyr::everything()) %>%
-    dplyr::rename(AC_X = X, AC_Y = Y, AC_Z = Z)
-  counts = as.data.frame(counts)
+    counts$id = id
+    counts = counts %>%
+      dplyr::select(id, dplyr::everything()) %>%
+      dplyr::rename(AC_X = X, AC_Y = Y, AC_Z = Z)
+    counts = as.data.frame(counts)
 
-  readr::write_csv(counts, counts_file, num_threads = 1)
+    readr::write_csv(counts, counts_file, num_threads = 1)
+  } else {
+    counts = NULL
+  }
 
   list(
     csv_file = csv_file,

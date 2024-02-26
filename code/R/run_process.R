@@ -42,8 +42,12 @@ for (index in seq(max_n)) {
       summarise_nhanes_80hz(
         csv_file = files$csv_file,
         log_file = files$log_file,
-        meta_file = files$meta_file,
-        counts_file = files$counts_file,
+        meta_file = NULL,
+        # meta_file = files$meta_file,
+        # counts_file = files$counts_file,
+        # make counts_file = NULL if don't want to run counts
+        counts_file = NULL,
+        calculate_mims = TRUE,
         measures_file = files$measures_file,
         sample_rate = 80L,
         dynamic_range = c(-6L, 6L),
