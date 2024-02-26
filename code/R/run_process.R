@@ -19,7 +19,7 @@ if (!is.na(ifold)) {
   df = df %>%
     dplyr::filter(fold %in% ifold)
 }
-
+force = TRUE
 
 max_n = nrow(df)
 index = 1
@@ -37,7 +37,10 @@ for (index in seq(max_n)) {
     measures_file = idf$measures_file
   )
 
-  if (!all(file.exists(unlist(files))) && file.exists(idf$csv_file)) {
+  if (
+    (!all(file.exists(unlist(files))) && file.exists(idf$csv_file)) ||
+    force
+    ) {
     x = try({
       summarise_nhanes_80hz(
         csv_file = files$csv_file,
