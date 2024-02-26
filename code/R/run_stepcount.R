@@ -72,9 +72,9 @@ for (i in seq_len(nrow(df))) {
     run_file = rename_xyzt(file, tmpdir = tempdir())
 
     for (model_type in model_types) {
+      model = models[[model_type]]
+      stepcount_col = stepcount_cols[model_type]
       if (!file.exists(idf[[stepcount_col]])) {
-        model = models[[model_type]]
-        stepcount_col = stepcount_cols[model_type]
         out = stepcount_with_model(file = run_file,
                                    model = model,
                                    model_type = model_type)
