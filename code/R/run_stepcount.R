@@ -44,11 +44,12 @@ stepcount_cols = sapply(model_types, function(model_type) {
 # Load the models
 models = lapply(model_types, function(model_type) {
   model_path = model_path_by_type(model_type)
-  sc_load_model(model_type = model_type,
+  res = sc_load_model(model_type = model_type,
                 model_path = model_path,
                 as_python = TRUE)
+  res
 })
-
+names(models) = model_types
 ifold = get_fold()
 
 if (!is.na(ifold)) {
@@ -57,6 +58,7 @@ if (!is.na(ifold)) {
 }
 
 i = 1
+model_type = model_types[1]
 
 for (i in seq_len(nrow(df))) {
   idf = df[i,]
