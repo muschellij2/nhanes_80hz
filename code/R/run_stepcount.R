@@ -45,8 +45,8 @@ stepcount_cols = sapply(model_types, function(model_type) {
 models = lapply(model_types, function(model_type) {
   model_path = model_path_by_type(model_type)
   res = sc_load_model(model_type = model_type,
-                model_path = model_path,
-                as_python = TRUE)
+                      model_path = model_path,
+                      as_python = TRUE)
   res
 })
 names(models) = model_types
@@ -72,21 +72,23 @@ for (i in seq_len(nrow(df))) {
     run_file = rename_xyzt(file, tmpdir = tempdir())
 
     for (model_type in model_types) {
-      model = models[[model_type]]
-      stepcount_col = stepcount_cols[model_type]
-      out = stepcount_with_model(file = run_file,
-                                 model = model,
-                                 model_type = model_type)
-      info = tibble::as_tibble(out$info)
-      info = janitor::clean_names(info)
-      info$filename = file
+      if (!file.exists(idf[[stepcount_col]])) {
+        model = models[[model_type]]
+        stepcount_col = stepcount_cols[model_type]
+        out = stepcount_with_model(file = run_file,
+                                   model = model,
+                                   model_type = model_type)
+        info = tibble::as_tibble(out$info)
+        info = janitor::clean_names(info)
+        info$filename = file
 
-      stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
-      result = dplyr::full_join(out$steps, out$walking)
-      result = result %>%
-        dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
-                      walking = walking > 0)
-      write_csv_gz(result, idf[[stepcount_col]])
+        stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
+        result = dplyr::full_join(out$steps, out$walking)
+        result = result %>%
+          dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
+                        walking = walking > 0)
+        write_csv_gz(result, idf[[stepcount_col]])
+      }
     }
     file.remove(run_file)
     file.remove(paste0(run_file, "bak"))
