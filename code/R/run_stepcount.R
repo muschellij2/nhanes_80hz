@@ -77,8 +77,6 @@ for (i in seq_len(nrow(df))) {
       out = stepcount_with_model(file = run_file,
                                  model = model,
                                  model_type = model_type)
-      file.remove(run_file)
-      file.remove(paste0(run_file, "bak"))
       info = tibble::as_tibble(out$info)
       info = janitor::clean_names(info)
       info$filename = file
@@ -90,5 +88,7 @@ for (i in seq_len(nrow(df))) {
                       walking = walking > 0)
       write_csv_gz(result, idf[[stepcount_col]])
     }
+    file.remove(run_file)
+    file.remove(paste0(run_file, "bak"))
   }
 }
