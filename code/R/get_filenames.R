@@ -177,6 +177,15 @@ get_version_filenames = function(nhanes_version) {
                                      folder_name, id)
     )
 
+
+  df = df %>%
+    dplyr::mutate(
+      nonwear_swan_file = make_csv_name(paste0("nonwear_swan", suffix),
+                                        folder_name, id),
+      nonwear_weartime_file = make_csv_name(paste0("nonwear_weartime", suffix),
+                                          folder_name, id)
+    )
+
   df = df %>%
     dplyr::mutate(version = folder_name) %>%
     dplyr::select(version, id, url, tarball_file, filename,
