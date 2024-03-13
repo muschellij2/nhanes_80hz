@@ -56,7 +56,7 @@ for (i in seq_len(nrow(df))) {
   sp$prob_nonwear_smooth = sapply(sp$prob_nonwear_smooth, identity)
   out = full_join(sp, out)
   out = out %>%
-    mutate(wear = prediction == "Nonwear",
+    mutate(wear = !prediction %in% "Nonwear",
            wear = ifelse(is.na(prediction) | prediction %in% "Unknown",
                          NA, wear)
     ) %>%
