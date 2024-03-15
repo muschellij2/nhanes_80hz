@@ -26,7 +26,8 @@ model_path_by_type = function(model_type) {
   model_path
 }
 
-model_types = c("ssl", "rf")
+# model_types = c("ssl", "rf")
+model_types = "ssl"
 sample_rate = 80L
 csv_col = ifelse(sample_rate == 80, "csv_file",
                  paste0("csv", sample_rate, "_file"))
