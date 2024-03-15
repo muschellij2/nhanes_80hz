@@ -89,6 +89,8 @@ for (i in seq_len(nrow(df))) {
           dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
                         walking = walking > 0)
         write_csv_gz(result, idf[[stepcount_col]])
+        rm(out)
+        rm(result)
       }
     }
     suppressWarnings({
