@@ -26,7 +26,8 @@ model_path_by_type = function(model_type) {
   model_path
 }
 
-model_types = c("ssl", "rf")
+# model_types = c("ssl", "rf")
+model_types = "ssl"
 sample_rate = 80L
 csv_col = ifelse(sample_rate == 80, "csv_file",
                  paste0("csv", sample_rate, "_file"))
@@ -89,6 +90,8 @@ for (i in seq_len(nrow(df))) {
           dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
                         walking = walking > 0)
         write_csv_gz(result, idf[[stepcount_col]])
+        rm(out)
+        rm(result)
       }
     }
     suppressWarnings({
