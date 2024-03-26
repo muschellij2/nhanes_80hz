@@ -50,37 +50,37 @@ for (i in seq_len(nrow(df))) {
   dir.create(dirname(idf$nonwear_weartime_file), recursive = TRUE,
              showWarnings = FALSE)
 
-  df = read_80hz(file)
+  data = read_80hz(file)
   sample_rate = 80L
-  nw_cnn = weartime::wt_cnn(df = df,
+  nw_cnn = weartime::wt_cnn(df = data,
                             sample_rate = sample_rate,
                             model_path = model_path)
   nw_cnn_out = nw_cnn %>%
     summarise_nonwear_second() %>%
     dplyr::rename(HEADER_TIMESTAMP = time, wear_cnn = wear)
 
-  nw_vmu = wt_vmu(df = df, sample_rate = sample_rate)
+  nw_vmu = wt_vmu(df = data, sample_rate = sample_rate)
   nw_vmu_out = nw_vmu %>%
     summarise_nonwear_second() %>%
     dplyr::rename(HEADER_TIMESTAMP = time, wear_vmu = wear)
 
   # wt_xyz is wt_baseline
-  nw_baseline = wt_baseline(df = df, sample_rate = sample_rate)
+  nw_baseline = wt_baseline(df = data, sample_rate = sample_rate)
   nw_baseline_out = nw_baseline %>%
     summarise_nonwear_second() %>%
     dplyr::rename(HEADER_TIMESTAMP = time, wear_baseline = wear)
 
-  nw_hees_2011 = wt_hees_2011(df = df, sample_rate = sample_rate)
+  nw_hees_2011 = wt_hees_2011(df = data, sample_rate = sample_rate)
   nw_hees_2011_out = nw_hees_2011 %>%
     summarise_nonwear_second() %>%
     dplyr::rename(HEADER_TIMESTAMP = time, wear_hees_2011 = wear)
 
-  nw_hees_2013 = wt_hees_2013(df = df, sample_rate = sample_rate)
+  nw_hees_2013 = wt_hees_2013(df = data, sample_rate = sample_rate)
   nw_hees_2013_out = nw_hees_2013 %>%
     summarise_nonwear_second() %>%
     dplyr::rename(HEADER_TIMESTAMP = time, wear_hees_2013 = wear)
 
-  nw_hees_optimized = wt_hees_optimized(df = df, sample_rate = sample_rate)
+  nw_hees_optimized = wt_hees_optimized(df = data, sample_rate = sample_rate)
   nw_hees_optimized_out = nw_hees_optimized %>%
     summarise_nonwear_second() %>%
     dplyr::rename(HEADER_TIMESTAMP = time, wear_hees_optimized = wear)
