@@ -52,6 +52,8 @@ for (i in seq_len(nrow(df))) {
              prob_wear_smooth,
              prob_nonwear_smooth = prob_nwear_smooth
       )
+    rm(nonwear)
+    rm(data)
     sp$prob_sleep_smooth = sapply(sp$prob_sleep_smooth, identity)
     sp$prob_wear_smooth = sapply(sp$prob_wear_smooth, identity)
     sp$prob_nonwear_smooth = sapply(sp$prob_nonwear_smooth, identity)
