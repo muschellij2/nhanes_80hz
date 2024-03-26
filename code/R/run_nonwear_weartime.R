@@ -59,32 +59,39 @@ for (i in seq_len(nrow(df))) {
     nw_cnn_out = nw_cnn %>%
       summarise_nonwear_second() %>%
       dplyr::rename(HEADER_TIMESTAMP = time, wear_cnn = wear)
+    rm(nw_cnn)
 
     nw_vmu = wt_vmu(df = data, sample_rate = sample_rate)
     nw_vmu_out = nw_vmu %>%
       summarise_nonwear_second() %>%
       dplyr::rename(HEADER_TIMESTAMP = time, wear_vmu = wear)
+    rm(nw_vmu)
 
     # wt_xyz is wt_baseline
     nw_baseline = wt_baseline(df = data, sample_rate = sample_rate)
     nw_baseline_out = nw_baseline %>%
       summarise_nonwear_second() %>%
       dplyr::rename(HEADER_TIMESTAMP = time, wear_baseline = wear)
+    rm(nw_baseline)
 
     nw_hees_2011 = wt_hees_2011(df = data, sample_rate = sample_rate)
     nw_hees_2011_out = nw_hees_2011 %>%
       summarise_nonwear_second() %>%
       dplyr::rename(HEADER_TIMESTAMP = time, wear_hees_2011 = wear)
+    rm(nw_hees_2011)
 
     nw_hees_2013 = wt_hees_2013(df = data, sample_rate = sample_rate)
     nw_hees_2013_out = nw_hees_2013 %>%
       summarise_nonwear_second() %>%
       dplyr::rename(HEADER_TIMESTAMP = time, wear_hees_2013 = wear)
+    rm(nw_hees_2013)
 
     nw_hees_optimized = wt_hees_optimized(df = data, sample_rate = sample_rate)
     nw_hees_optimized_out = nw_hees_optimized %>%
       summarise_nonwear_second() %>%
       dplyr::rename(HEADER_TIMESTAMP = time, wear_hees_optimized = wear)
+    rm(nw_hees_optimized)
+    rm(data)
 
     out = nw_cnn_out %>%
       full_join(nw_vmu_out, by = join_by(HEADER_TIMESTAMP)) %>%
