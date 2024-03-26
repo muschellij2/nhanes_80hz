@@ -35,8 +35,8 @@ for (i in seq_len(nrow(df))) {
   dir.create(dirname(idf$nonwear_swan_file), recursive = TRUE,
              showWarnings = FALSE)
 
-  df = read_80hz(file)
-  nonwear = swan::swan(df = df, sampling_rate = 80L)
+  data = read_80hz(file)
+  nonwear = swan::swan(df = data, sampling_rate = 80L)
   out = nonwear$first_pass %>%
     select(HEADER_TIMESTAMP = header_time_stamp,
            first_pass_predicted = predicted)

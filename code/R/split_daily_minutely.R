@@ -6,7 +6,7 @@ source(here::here("code/R/helper_functions.R"))
 nh_table = "PAXMIN_H"
 df = NULL
 
-write_full_csv = function( nh_table, df = NULL, ...) {
+write_full_csv = function(nh_table, df = NULL, ...) {
   stopifnot(length(nh_table) == 1)
 
   file = daily_min_file(nh_table)
