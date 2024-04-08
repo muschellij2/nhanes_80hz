@@ -47,10 +47,12 @@ Rnosave code/R/run_oak_verisense.R -J WALK --array=101-200 --mem=52G -o %x_%A_%a
 Rnosave code/R/write_steps_data.R -J STEPS --mem=20G -o %x_%A.out -e %x_%A.err
 
 Rnosave code/R/run_stepcount.R -J STEPCOUNT --array=1-200 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
+Rnosave code/R/run_stepcount.R -J STEPCOUNT --array=8,15,18,26,29,30,42,44,54,57,58,65,67,69,70,72,76,78,86,89,100,101,113,119,120,121,124,129,138,145,146,149,154-200 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
 
 Rnosave code/R/run_nonwear_weartime.R -J WEARTIME --array=1-200 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
-Rnosave code/R/run_nonwear_swan.R -J SWAN --array=1-200 --mem=15G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
+Rnosave code/R/run_nonwear_swan.R -J SWAN --array=83-200 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
+# Rnosave code/R/run_nonwear_swan.R -J SWAN --array=1-64,66,74,84,88,89,92,93,110,118 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
 # Rnosave data/lily/code/run_adept.R -J ADEPT --nodes=1 --ntasks=1 --cpus-per-task=8  --array=11-20 --mem=100G -o %x_%A_%a.out -e %x_%A_%a.err
 Rnosave data/lily/code/run_adept_byrank.R -J ADEPT --nodes=1 --ntasks=1 --cpus-per-task=8  --array=11-20 --mem=100G -o %x_%A_%a.out -e %x_%A_%a.err
