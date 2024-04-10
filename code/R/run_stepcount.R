@@ -78,21 +78,26 @@ for (i in seq_len(nrow(df))) {
       model = models[[model_type]]
       stepcount_col = stepcount_cols[model_type]
       if (!file.exists(idf[[stepcount_col]])) {
-        out = stepcount_with_model(file = run_file,
-                                   model = model,
-                                   model_type = model_type)
-        info = tibble::as_tibble(out$info)
-        info = janitor::clean_names(info)
-        info$filename = file
+        out = try({
+          stepcount_with_model(file = run_file,
+                               model = model,
+                               model_type = model_type)
+        })
+        # errors can happen if all the data is zero
+        if (!inherits(out, "try-error")) {
+          info = tibble::as_tibble(out$info)
+          info = janitor::clean_names(info)
+          info$filename = file
 
-        stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
-        result = dplyr::full_join(out$steps, out$walking)
-        result = result %>%
-          dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
-                        walking = walking > 0)
-        write_csv_gz(result, idf[[stepcount_col]])
+          stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
+          result = dplyr::full_join(out$steps, out$walking)
+          result = result %>%
+            dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
+                          walking = walking > 0)
+          write_csv_gz(result, idf[[stepcount_col]])
+          rm(result)
+        }
         rm(out)
-        rm(result)
       }
     }
     suppressWarnings({
