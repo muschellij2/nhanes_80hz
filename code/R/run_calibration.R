@@ -26,11 +26,16 @@ for (i in seq_len(nrow(df))) {
   print(paste0(i, " of ", nrow(df)))
   file = idf$csv_file
   acc_csv_file = idf$acc_csv_file
-  outfile = idf$calibrated_file
-  dir.create(dirname(outfile), showWarnings = FALSE, recursive = TRUE)
+  outfiles = c(idf$calibrated_file,
+               idf$ggir_calibrated_file,
+               idf$calibration_params_file,
+               idf$ggir_calibration_params_file)
+  sapply(outfiles, function(outfile) {
+    dir.create(dirname(outfile), showWarnings = FALSE, recursive = TRUE)
+  })
   print(file)
 
-  if (!all(file.exists(outfile))) {
+  if (!all(file.exists(outfiles))) {
     data = read_80hz(file, progress = FALSE)
     data = data %>%
       dplyr::rename(time = HEADER_TIMESTAMP)
@@ -39,20 +44,41 @@ for (i in seq_len(nrow(df))) {
     data = as.data.frame(data)
     attr(data, "sample_rate") = 80L
     attr(data, "last_sample_time") = max(df$time)
-
-    # calibrated = agcalibrate(df, verbose = TRUE)
-    C <- agcounts:::gcalibrateC(dataset = as.matrix(data[, c("X", "Y", "Z")]), sf = 80L)
-
     xyz = c("X", "Y", "Z")
-    data[, xyz] <- scale(data[, xyz], center = -C$offset, scale = 1/C$scale)
 
-    # I <- GGIR::g.inspectfile(datafile = file)
-    # C <- GGIR::g.calibrate(datafile = file,
-    #                        use.temp = FALSE,
-    #                        printsummary = FALSE,
-    #                        inspectfileobject = I)
+    mat = as.matrix(data[, xyz])
+    # calibrated = agcalibrate(df, verbose = TRUE)
+    C <- agcounts:::gcalibrateC(dataset = mat, sf = 80L)
+    cmat = tibble(
+      scale = C$scale,
+      offset = C$offset,
+      axis = xyz
+    )
+    write_csv_gz(cmat, idf$calibration_params_file)
 
-    write_csv_gz(data, outfile)
+
+    ggir_I <- GGIR::g.inspectfile(datafile = idf$acc_csv_file)
+    ggir_C <- GGIR::g.calibrate(datafile = idf$acc_csv_file,
+                                use.temp = FALSE,
+                                printsummary = FALSE,
+                                inspectfileobject = ggir_I)
+    cmat = tibble(
+      scale = ggir_C$scale,
+      offset = ggir_C$offset,
+      axis = xyz
+    )
+    write_csv_gz(cmat, idf$ggir_calibration_params_file)
+
+    data[,xyz] <- round(
+      scale(mat[,xyz], center = -C$offset, scale = 1/C$scale),
+      4)
+    write_csv_gz(data, idf$calibrated_file)
+    ## Using GGIR Derived
+    data[,xyz] <- round(
+      scale(mat[,xyz], center = -ggir_C$offset, scale = 1/ggir_C$scale),
+      4)
+    write_csv_gz(data, idf$ggir_calibrated_file)
+    rm(mat)
     rm(data)
   }
 }
