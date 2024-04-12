@@ -54,6 +54,8 @@ for (i in seq_len(nrow(df))) {
       offset = C$offset,
       axis = xyz
     )
+    names(C$offset) = xyz
+    names(C$scale) = xyz
     write_csv_gz(cmat, idf$calibration_params_file)
 
 
@@ -67,16 +69,28 @@ for (i in seq_len(nrow(df))) {
       offset = ggir_C$offset,
       axis = xyz
     )
+    names(ggir_C$offset) = xyz
+    names(ggir_C$scale) = xyz
     write_csv_gz(cmat, idf$ggir_calibration_params_file)
 
-    data[,xyz] <- round(
-      scale(mat[,xyz], center = -C$offset, scale = 1/C$scale),
-      4)
+    for (icol in xyz) {
+      data[,icol] <- round(
+        (mat[,icol] - (-C$offset[icol])) / (1/C$scale[icol]),
+        4)
+    }
+    # data[,xyz] <- round(
+    #   scale(mat[,xyz], center = -C$offset, scale = 1/C$scale),
+    #   4)
     write_csv_gz(data, idf$calibrated_file)
     ## Using GGIR Derived
-    data[,xyz] <- round(
-      scale(mat[,xyz], center = -ggir_C$offset, scale = 1/ggir_C$scale),
-      4)
+    # data[,xyz] <- round(
+    #   scale(mat[,xyz], center = -ggir_C$offset, scale = 1/ggir_C$scale),
+    #   4)
+    for (icol in xyz) {
+      data[,icol] <- round(
+        (mat[,icol] - (-ggir_C$offset[icol])) / (1/ggir_C$scale[icol]),
+        4)
+    }
     write_csv_gz(data, idf$ggir_calibrated_file)
     rm(mat)
     rm(data)
