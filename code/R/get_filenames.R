@@ -118,6 +118,15 @@ get_version_filenames = function(nhanes_version) {
       calibrated_file = make_csv_name(paste0("gravity_calibrated", suffix),
                                folder_name, id),
 
+      calibration_params_file = make_csv_name(paste0("gravity_params", suffix),
+                                      folder_name, id),
+
+      ggir_calibrated_file = make_csv_name(paste0("ggir_gravity_calibrated", suffix),
+                                      folder_name, id),
+
+      ggir_calibration_params_file = make_csv_name(paste0("ggir_gravity_params", suffix),
+                                      folder_name, id),
+
       acc_csv_file = make_csv_name(paste0("acc_csv", suffix),
                                    folder_name, id),
 

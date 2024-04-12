@@ -1,6 +1,6 @@
 library(janitor)
 library(tibble)
-library(stepcount)
+library(GGIR)
 library(agcounts)
 library(dplyr)
 options(digits.secs = 3)
@@ -20,49 +20,65 @@ if (!is.na(ifold)) {
 }
 
 i = 1
-model_type = model_types[1]
 
 for (i in seq_len(nrow(df))) {
   idf = df[i,]
   print(paste0(i, " of ", nrow(df)))
-  file = idf[[csv_col]]
-  dir.create(dirname(file), showWarnings = FALSE, recursive = TRUE)
+  file = idf$csv_file
+  acc_csv_file = idf$acc_csv_file
+  outfiles = c(idf$calibrated_file,
+               idf$ggir_calibrated_file,
+               idf$calibration_params_file,
+               idf$ggir_calibration_params_file)
+  sapply(outfiles, function(outfile) {
+    dir.create(dirname(outfile), showWarnings = FALSE, recursive = TRUE)
+  })
   print(file)
-  stepcount_outfiles = unlist(idf[,stepcount_cols])
-  names(stepcount_outfiles) = model_types
-  if (!all(file.exists(stepcount_outfiles))) {
-    run_file = rename_xyzt(file, tmpdir = tempdir())
 
-    for (model_type in model_types) {
-      message("Running model: ", model_type)
-      model = models[[model_type]]
-      stepcount_col = stepcount_cols[model_type]
-      if (!file.exists(idf[[stepcount_col]])) {
-        out = try({
-          stepcount_with_model(file = run_file,
-                               model = model,
-                               model_type = model_type)
-        })
-        # errors can happen if all the data is zero
-        if (!inherits(out, "try-error")) {
-          info = tibble::as_tibble(out$info)
-          info = janitor::clean_names(info)
-          info$filename = file
+  if (!all(file.exists(outfiles))) {
+    data = read_80hz(file, progress = FALSE)
+    data = data %>%
+      dplyr::rename(time = HEADER_TIMESTAMP)
+    # needed for fix of agcounts
+    # PR at https://github.com/bhelsel/agcounts/pull/32
+    data = as.data.frame(data)
+    attr(data, "sample_rate") = 80L
+    attr(data, "last_sample_time") = max(df$time)
+    xyz = c("X", "Y", "Z")
 
-          stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
-          result = dplyr::full_join(out$steps, out$walking)
-          result = result %>%
-            dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
-                          walking = walking > 0)
-          write_csv_gz(result, idf[[stepcount_col]])
-          rm(result)
-        }
-        rm(out)
-      }
-    }
-    suppressWarnings({
-      file.remove(run_file)
-      file.remove(paste0(run_file, "bak"))
-    })
+    mat = as.matrix(data[, xyz])
+    # calibrated = agcalibrate(df, verbose = TRUE)
+    C <- agcounts:::gcalibrateC(dataset = mat, sf = 80L)
+    cmat = tibble(
+      scale = C$scale,
+      offset = C$offset,
+      axis = xyz
+    )
+    write_csv_gz(cmat, idf$calibration_params_file)
+
+
+    ggir_I <- GGIR::g.inspectfile(datafile = idf$acc_csv_file)
+    ggir_C <- GGIR::g.calibrate(datafile = idf$acc_csv_file,
+                                use.temp = FALSE,
+                                printsummary = FALSE,
+                                inspectfileobject = ggir_I)
+    cmat = tibble(
+      scale = ggir_C$scale,
+      offset = ggir_C$offset,
+      axis = xyz
+    )
+    write_csv_gz(cmat, idf$ggir_calibration_params_file)
+
+    data[,xyz] <- round(
+      scale(mat[,xyz], center = -C$offset, scale = 1/C$scale),
+      4)
+    write_csv_gz(data, idf$calibrated_file)
+    ## Using GGIR Derived
+    data[,xyz] <- round(
+      scale(mat[,xyz], center = -ggir_C$offset, scale = 1/ggir_C$scale),
+      4)
+    write_csv_gz(data, idf$ggir_calibrated_file)
+    rm(mat)
+    rm(data)
   }
 }
