@@ -31,6 +31,6 @@ for (i in seq_len(nrow(df))) {
 
 out = df %>%
   select(id, version, all_zero, csv_file)
-readr::write_csv(out, here::here("data/raw/all_zero.rds"))
+readr::write_csv(out, here::here("data/raw/all_zero.csv"))
 
 

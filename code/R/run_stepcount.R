@@ -12,6 +12,12 @@ rm(list = c("fold"))
 
 df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 xdf = df
+zero_df = readr::read_csv(here::here("data/raw/all_zero.csv.gz"))
+df = left_join(df,
+               zero_df %>%
+                 select(id, version, all_zero) %>%
+                 mutate(id = as.character(id)))
+
 
 model_path_by_type = function(model_type) {
   model_filename = sc_model_filename(model_type)
@@ -70,7 +76,7 @@ for (i in seq_len(nrow(df))) {
   print(file)
   stepcount_outfiles = unlist(idf[,stepcount_cols])
   names(stepcount_outfiles) = model_types
-  if (!all(file.exists(stepcount_outfiles))) {
+  if (!all(file.exists(stepcount_outfiles)) && !idf$all_zero) {
     run_file = rename_xyzt(file, tmpdir = tempdir())
 
     for (model_type in model_types) {
