@@ -8,6 +8,7 @@ source(here::here("code/R/helper_functions.R"))
 nh_tables = c("PAXHD_G", "PAXHD_H", "Y_PAXHD")
 nh_table = nh_tables[1]
 for (nh_table in nh_tables) {
+  print(nh_table)
   table = normalize_table_name(nh_table)
   file = here::here("data", "raw", paste0(table, ".XPT"))
   if (!file.exists(file)) {

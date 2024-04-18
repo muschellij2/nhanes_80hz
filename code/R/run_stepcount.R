@@ -60,7 +60,7 @@ models = lapply(model_types, function(model_type) {
 names(models) = model_types
 ifold = get_fold()
 
-if (!is.na(ifold)) {
+if (!all(is.na(ifold))) {
   df = df %>%
     dplyr::filter(fold %in% ifold)
 }

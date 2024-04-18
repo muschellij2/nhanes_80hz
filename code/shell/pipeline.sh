@@ -49,11 +49,11 @@ Rnosave code/R/write_steps_data.R -J STEPS --mem=20G -o %x_%A.out -e %x_%A.err
 Rnosave code/R/flag_all_zero.R -J ZERO --mem=8G -o %x_%A.out -e %x_%A.err --time=4-00:00:00
 
 Rnosave code/R/run_stepcount.R -J STEPCOUNT --array=1-200 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
-Rnosave code/R/run_stepcount.R -J STEPCOUNT --array=8,119,174,176,182,183,184,185,186,187,188,189 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
+Rnosave code/R/run_stepcount.R -J STEPCOUNT --array=8,18,119,166,168,181,182,183,184,185,186,187,188,189 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
 
-Rnosave code/R/run_nonwear_weartime.R -J WEARTIME --array=1-200 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
-Rnosave code/R/run_nonwear_swan.R -J SWAN --array=83-200 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
+Rnosave code/R/run_nonwear_weartime.R -J WEARTIME --array=8,15,19,24,29,36,39,40,47,51,73,74,80,82,91,92,99,106,110,117,120,143,144,146,152,154,156,162,168,170,172,183,186,187,188,195 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
+Rnosave code/R/run_nonwear_swan.R -J SWAN --array=8,11-13,15-31,33-35,37-48,50-64,66,74,84,88-89,92-93,110,118 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 # Rnosave code/R/run_nonwear_swan.R -J SWAN --array=1-64,66,74,84,88,89,92,93,110,118 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
 Rnosave code/R/run_calibration.R -J CALIBRATE --array=1-200 --mem=15G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
