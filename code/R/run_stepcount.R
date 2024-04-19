@@ -1,6 +1,7 @@
 library(janitor)
 library(tibble)
 library(stepcount)
+library(readr)
 unset_reticulate_python()
 use_stepcount_condaenv()
 library(dplyr)

@@ -1,0 +1,13 @@
+---
+title: "Multiple Imputation with Minute-Level Accelerometry Data"
+format: html
+editor: visual
+---
+
+
+Our tree studies have multiple days of measurement on each person. One of the issues with this is that some participants don't wear the device for the full day and non-where estimation algorithms determine that a minute is not worn.
+We believe that the majority of accelerometer data is aggregated at the minute level, and then analyzed. Some methodology average across the days to get a an average day. We discuss two ways to perform invitation on missing data based on a functional principal components approach. Both of these methods scale with the size of the data required for most accelerometer he studies, in the tens of thousands of participants. One distinction is whether a researcher would, or should average across the days and then impute or impute the data, and then average.
+
+Regardless, in this paper, we discuss how to perform this operation and provide the associated code to do it with the underline theoretical underpinnings that motivate this problem.
+
+In many analyses, the intent for creating 1440 format is to get a "average "day. From that perspective, each day represents some realization of a mean day plus some noise due to that specific days, activities and variability. Those levels of variability can include the weather, things need to be done that day, activity and energy levels, and other things taht affect daily life.  The average of those days tries to smooth out the day today variability, by definition, to understand how people typically spend their days. If we extend this thought process, then averaging over an entire year would show you a typical day. If we could go to the extreme and measured every single day of a person then we would literally know their average day.

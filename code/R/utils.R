@@ -100,3 +100,14 @@ read_daily_min = function(nh_table, ...) {
   df
 }
 
+
+
+read_last <- function(file) {
+  readr::read_csv(pipe(paste("tail -n 1", file)), col_names=FALSE)
+}
+
+read_first_last = function(file) {
+  head = readr::read_csv(file, ..., n_max = 1)
+  tail = read_last(file)
+  dplyr::bind_rows(head, tail)
+}
