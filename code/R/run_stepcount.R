@@ -59,6 +59,7 @@ models = lapply(model_types, function(model_type) {
   res
 })
 names(models) = model_types
+
 ifold = get_fold()
 
 if (!all(is.na(ifold))) {
@@ -88,7 +89,8 @@ for (i in seq_len(nrow(df))) {
         out = try({
           stepcount_with_model(file = run_file,
                                model = model,
-                               model_type = model_type)
+                               model_type = model_type,
+                               sample_rate = sample_rate)
         })
         # errors can happen if all the data is zero
         if (!inherits(out, "try-error")) {
@@ -97,6 +99,9 @@ for (i in seq_len(nrow(df))) {
           info$filename = file
 
           stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
+          # need this for the rf
+          out$walking = out$walking %>%
+            dplyr::mutate(time = as.POSIXct(floor(as.numeric(time))))
           result = dplyr::full_join(out$steps, out$walking)
           result = result %>%
             dplyr::mutate(non_wear = is.na(steps) & is.na(walking),
