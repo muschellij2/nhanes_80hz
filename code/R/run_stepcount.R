@@ -102,7 +102,7 @@ for (i in seq_len(nrow(df))) {
           write_csv_gz(info, idf[[stepcount_params_col]])
 
           stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
-          # need this for the rf
+          # need this for the rf - resampling doesn't round time correctly
           out$walking = out$walking %>%
             dplyr::mutate(time = as.POSIXct(floor(as.numeric(time))))
           result = dplyr::full_join(out$steps, out$walking)
