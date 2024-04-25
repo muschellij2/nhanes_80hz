@@ -15,6 +15,12 @@ rm(list = c("fold"))
 
 
 df = readRDS(here::here("data", "raw", "all_filenames.rds"))
+zero_df = readr::read_csv(here::here("data/raw/all_zero.csv.gz"))
+df = left_join(df,
+               zero_df %>%
+                 select(id, version, all_zero) %>%
+                 mutate(id = as.character(id)))
+
 xdf = df
 
 ifold = get_fold()
@@ -35,12 +41,12 @@ for (i in seq_len(nrow(df))) {
   dir.create(dirname(idf$nonwear_swan_file), recursive = TRUE,
              showWarnings = FALSE)
 
-  if (!file.exists(idf$nonwear_swan_file)) {
+  if (!file.exists(idf$nonwear_swan_file) && !idf$all_zero) {
     data = read_80hz(file)
     nonwear = try({
       swan::swan(df = data, sampling_rate = 80L)
     })
-    if (!inherits(nonwear, "try-error")) {
+    if (!inherits(nonwear, "try-error") && !is.null(nonwear)) {
       out = nonwear$first_pass %>%
         select(HEADER_TIMESTAMP = header_time_stamp,
                first_pass_predicted = predicted)
