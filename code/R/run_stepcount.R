@@ -50,6 +50,7 @@ stepcount_cols = sapply(model_types, function(model_type) {
   stepcount_col
 })
 
+stepcount_params_cols = sub("stepcount", "stepcount_params", stepcount_cols)
 # Load the models
 models = lapply(model_types, function(model_type) {
   model_path = model_path_by_type(model_type)
@@ -85,6 +86,7 @@ for (i in seq_len(nrow(df))) {
       message("Running model: ", model_type)
       model = models[[model_type]]
       stepcount_col = stepcount_cols[model_type]
+      stepcount_params_col = stepcount_params_cols[model_type]
       if (!file.exists(idf[[stepcount_col]])) {
         out = try({
           stepcount_with_model(file = run_file,
@@ -97,6 +99,7 @@ for (i in seq_len(nrow(df))) {
           info = tibble::as_tibble(out$info)
           info = janitor::clean_names(info)
           info$filename = file
+          write_csv_gz(info, idf[[stepcount_params_col]])
 
           stopifnot(all(out$walking$walking %in% c(NaN, 0L, 1L)))
           # need this for the rf

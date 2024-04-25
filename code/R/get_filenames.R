@@ -163,16 +163,24 @@ get_version_filenames = function(nhanes_version) {
     dplyr::mutate(
       stepcount_file = make_csv_name(paste0("stepcount", suffix),
                                folder_name, id),
+      stepcount_params_file = make_csv_name(paste0("stepcount_params", suffix),
+                                     folder_name, id),
       stepcount30_file = make_csv_name(paste0("stepcount_30", suffix),
-                                     folder_name, id)
+                                     folder_name, id),
+      stepcount30_params_file = make_csv_name(paste0("stepcount_30_params", suffix),
+                                            folder_name, id)
     )
 
   df = df %>%
     dplyr::mutate(
       rf_stepcount_file = make_csv_name(paste0("rf_stepcount", suffix),
                                      folder_name, id),
+      rf_stepcount_params_file = make_csv_name(paste0("rf_stepcount_params", suffix),
+                                            folder_name, id),
       rf_stepcount30_file = make_csv_name(paste0("rf_stepcount_30", suffix),
-                                       folder_name, id)
+                                       folder_name, id),
+      rf_stepcount30_params_file = make_csv_name(paste0("rf_stepcount30_params", suffix),
+                                               folder_name, id),
     )
 
   df = df %>%
