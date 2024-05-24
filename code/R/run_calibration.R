@@ -58,8 +58,12 @@ for (i in seq_len(nrow(df))) {
       agcounts:::gcalibrateC(dataset = mat, sf = 80L)
       })
     if (inherits(C, "try-error")) {
+      rm(data)
+      rm(mat)
+      gc()
       next
     }
+    gc()
     cmat = tibble(
       scale = C$scale,
       offset = C$offset,
@@ -79,12 +83,21 @@ for (i in seq_len(nrow(df))) {
     #   4)
     write_csv_gz(data, idf$calibrated_file)
     rm(mat)
+    gc()
 
     ggir_I <- GGIR::g.inspectfile(datafile = idf$acc_csv_file)
-    ggir_C <- GGIR::g.calibrate(datafile = idf$acc_csv_file,
-                                use.temp = FALSE,
-                                printsummary = FALSE,
-                                inspectfileobject = ggir_I)
+    ggir_C <- try({
+      GGIR::g.calibrate(datafile = idf$acc_csv_file,
+                        use.temp = FALSE,
+                        printsummary = FALSE,
+                        inspectfileobject = ggir_I)
+    })
+    if (inherits(ggir_C, "try-error")) {
+      rm(data)
+      rm(mat)
+      gc()
+      next
+    }
     cmat = tibble(
       scale = ggir_C$scale,
       offset = ggir_C$offset,
