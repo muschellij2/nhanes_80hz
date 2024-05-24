@@ -52,7 +52,9 @@ for (i in seq_len(nrow(df))) {
     attr(data, "last_sample_time") = max(data$time)
     xyz = c("X", "Y", "Z")
 
+    message("Creating Matrix")
     mat = as.matrix(data[, xyz])
+    message("Running gcalibrate")
     # calibrated = agcalibrate(df, verbose = TRUE)
     C <- try({
       agcounts:::gcalibrateC(dataset = mat, sf = 80L)
@@ -64,6 +66,7 @@ for (i in seq_len(nrow(df))) {
       next
     }
     gc()
+    message("Creating Calibration Table for gcalibrate")
     cmat = tibble(
       scale = C$scale,
       offset = C$offset,
@@ -73,6 +76,7 @@ for (i in seq_len(nrow(df))) {
     names(C$scale) = xyz
     write_csv_gz(cmat, idf$calibration_params_file)
 
+    message("Calibrating Data for gcalibrate")
     for (icol in xyz) {
       data[,icol] <- round(
         (mat[,icol] - (-C$offset[icol])) / (1/C$scale[icol]),
@@ -85,7 +89,9 @@ for (i in seq_len(nrow(df))) {
     rm(mat)
     gc()
 
+    message("Inspecting file")
     ggir_I <- GGIR::g.inspectfile(datafile = idf$acc_csv_file)
+    message("Running g.calibrate")
     ggir_C <- try({
       GGIR::g.calibrate(datafile = idf$acc_csv_file,
                         use.temp = FALSE,
@@ -98,6 +104,7 @@ for (i in seq_len(nrow(df))) {
       gc()
       next
     }
+    message("Creating Calibration Table for GGIR::g.calibrate")
     cmat = tibble(
       scale = ggir_C$scale,
       offset = ggir_C$offset,
@@ -112,6 +119,7 @@ for (i in seq_len(nrow(df))) {
     # data[,xyz] <- round(
     #   scale(mat[,xyz], center = -ggir_C$offset, scale = 1/ggir_C$scale),
     #   4)
+    message("Calibrating Data for GGIR::g.calibrate")
     for (icol in xyz) {
       data[,icol] <- round(
         (data[,icol] - (-ggir_C$offset[icol])) / (1/ggir_C$scale[icol]),
