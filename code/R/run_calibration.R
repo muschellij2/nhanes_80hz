@@ -55,6 +55,7 @@ for (i in seq_len(nrow(df))) {
     message("Creating Matrix")
     mat = as.matrix(data[, xyz])
     message("Running gcalibrate")
+    gc()
     # calibrated = agcalibrate(df, verbose = TRUE)
     C <- try({
       agcounts:::gcalibrateC(dataset = mat, sf = 80L)
