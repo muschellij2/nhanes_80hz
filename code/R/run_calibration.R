@@ -65,7 +65,8 @@ for (i in seq_len(nrow(df))) {
       gc()
       next
     }
-    gc()
+    # message("Running GC after gcalibrate")
+    # gc()
     message("Creating Calibration Table for gcalibrate")
     cmat = tibble(
       scale = C$scale,
