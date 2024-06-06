@@ -1,5 +1,5 @@
 longformat="--format=JobID,JobName,Partition,MaxVMSize,MaxRSS,AveRSS,MinCPU,AveCPU,NTasks,AllocCPUS,Elapsed,State,ExitCode,ReqMem,MaxDiskRead,AveDiskRead,MaxDiskWrite"
-Rnosave code/R/get_filenames.R -N FILENAMES
+Rnosave code/R/get_filenames.R -J FILENAMES
 
 # Getting the files/tarballs
 # Rnosave code/R/get_files.R -N GET_FILES -l mem_free=2G,h_vmem=3G -t 1-200
