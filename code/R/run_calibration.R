@@ -28,7 +28,8 @@ if (!is.na(ifold)) {
 i = 1
 
 # types = c("agcounts", "GGIR")
-types = "GGIR"
+# types = "GGIR"
+types = "agcounts"
 type = types[1]
 
 for (i in seq_len(nrow(df))) {
