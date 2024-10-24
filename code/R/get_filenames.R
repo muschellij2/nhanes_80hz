@@ -115,6 +115,10 @@ get_version_filenames = function(nhanes_version) {
       csv_file = make_csv_name(paste0("csv", suffix),
                                folder_name, id),
 
+      time_csv_file = make_csv_name(paste0("time_csv", suffix),
+                               folder_name, id),
+
+
       calibrated_file = make_csv_name(paste0("gravity_calibrated", suffix),
                                folder_name, id),
 
