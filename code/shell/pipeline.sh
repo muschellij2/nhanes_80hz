@@ -9,6 +9,8 @@ Rnosave code/R/get_files.R -N GET_FILES --array=1-200 --mem=3G
 # Rnosave code/R/tarball_to_csv.R -N TARBALL -t 1-200 -l mem_free=20G,h_vmem=21G
 # Rnosave code/R/tarball_to_csv.R -N TARBALL --array=1-200 --mem=21G
 
+Rnosave code/R/copy_csv_with_new_header.R -N COPIER -t 1-200 -l mem_free=20G,h_vmem=21G
+
 # Rnosave code/R/run_process.R -N PROC -hold_jid_ad TARBALL -t 1-200 -l mem_free=20G,h_vmem=21G
 # dep=`get_job_id TARBALL`
 # if [[ -n "${dep}" ]]; then
