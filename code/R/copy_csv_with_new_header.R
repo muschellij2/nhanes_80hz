@@ -19,30 +19,24 @@ if (!is.na(ifold)) {
 xdf = df
 
 df = df %>%
-  dplyr::filter(file.exists(tarball_file))
+  dplyr::filter(file.exists(csv_file))
 
 max_n = nrow(df)
 index = 1
 for (index in seq(max_n)) {
   # print(index)
   idf = df[index,]
-  print(idf$tarball_file)
-  files = list(
-    tarball_file = idf$tarball_file,
-    csv_file = idf$csv_file,
-    log_file = idf$log_file,
-    meta_file = idf$meta_file
-  )
-
-  if (!all(file.exists(unlist(files)))) {
-    x = tarball_to_csv(
-      tarball_file = files$tarball_file,
-      csv_file = files$csv_file,
-      log_file = files$log_file,
-      meta_file = files$meta_file,
-      num_threads = 1
-    )
-    # doing this so .Last.value isn't maintained
-    rm(x)
+  print(idf$csv_file)
+  outfile = idf$time_csv_file
+  if (!all(file.exists(outfile))) {
+    file = rename_xyzt(csv_file = idf$csv_file)
+    R.utils::gzip(
+      file,
+      destname = outfile,
+      overwrite = TRUE,
+      remove = TRUE)
+    suppressWarnings({
+      file.remove(file)
+    })
   }
 }
