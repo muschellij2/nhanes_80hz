@@ -52,9 +52,6 @@ for (index in seq(max_n)) {
       #=====================
       # read.myacc.csv arguments for reading in CSVS
       #=====================
-
-
-      #=====================
       rmc.nrow = Inf,
       rmc.skip = 0,
       rmc.dec = ".",
