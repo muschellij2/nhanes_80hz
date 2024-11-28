@@ -32,3 +32,5 @@ stepcount_data
 *.err
 *.out
 pubs
+acctest
+
