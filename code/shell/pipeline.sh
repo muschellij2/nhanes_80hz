@@ -3,13 +3,14 @@ Rnosave code/R/get_filenames.R -J FILENAMES
 
 # Getting the files/tarballs
 # Rnosave code/R/get_files.R -N GET_FILES -l mem_free=2G,h_vmem=3G -t 1-200
-Rnosave code/R/get_files.R -N GET_FILES --array=1-200 --mem=3G
+Rnosave code/R/get_files.R -J GET_FILES --array=1-200 --mem=3G
 
 # Converting the tarball
 # Rnosave code/R/tarball_to_csv.R -N TARBALL -t 1-200 -l mem_free=20G,h_vmem=21G
 # Rnosave code/R/tarball_to_csv.R -N TARBALL --array=1-200 --mem=21G
 
-Rnosave code/R/copy_csv_with_new_header.R -N COPIER -t 1-200 -l mem_free=20G,h_vmem=21G
+Rnosave code/R/copy_csv_with_new_header.R -J COPIER --array=1-200 --mem=10G -o %x_%A_%a.out -e %x_%A_%a.err
+
 
 # Rnosave code/R/run_process.R -N PROC -hold_jid_ad TARBALL -t 1-200 -l mem_free=20G,h_vmem=21G
 # dep=`get_job_id TARBALL`
@@ -66,3 +67,8 @@ Rnosave code/R/run_calibration.R -J CALIBRATE --array=1,2,4-9 --mem=35G -o %x_%A
 Rnosave data/lily/code/run_adept_byrank.R -J ADEPT --nodes=1 --ntasks=1 --cpus-per-task=8  --array=11-20 --mem=100G -o %x_%A_%a.out -e %x_%A_%a.err
 
 # --exclude=compute-115
+# accProcess 62161.csv --csvTimeFormat 'yyyy-MM-dd HH:mm:ss.SSS' --csvTimeXYZTempColsIndex 0,1,2,3 --sampleRate 80
+# if we want wear time
+accProcess 62161.csv --csvTimeFormat 'yyyy-MM-dd HH:mm:ss.SSS' --csvTimeXYZTempColsIndex 0,1,2,3 --sampleRate 80 --deleteIntermediateFiles False
+# --deleteIntermediateFiles False
+# --outputFolder ./test
