@@ -43,7 +43,7 @@ for (index in seq(max_n)) {
     minimumFileSizeMB = 0, # don't let small gz files be skipped
     do.parallel = FALSE,
     dynrange = 6L, # dynamic range of 6g (https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PAX80_G.htm)
-    idloc = 6, # filename gives the ID before the "."
+    idloc = 6, # file name gives the ID before the "."
 
     #=====================
     # read.myacc.csv arguments for reading in CSVS
@@ -52,26 +52,26 @@ for (index in seq(max_n)) {
     rmc.skip = 0,
     rmc.dec = ".",
     rmc.firstrow.acc = 2,
-    rmc.firstrow.header = 1,
+    rmc.firstrow.header = NULL,
+    rmc.header.length = NULL,
     rmc.col.acc = 2:4,
+    rmc.col.temp = NULL,
     rmc.col.time = 1,
     rmc.unit.acc = "g",
     rmc.unit.time = "character",
-    rmc.format.time = "%Y-%m-%d %H:%M:%OS",
+    rmc.format.time = "%Y-%m-%dT%H:%M:%OS",
+    rmc.bitrate = NULL,
+    rmc.dynamic_range = 6,
+    rmc.unsignedbit = TRUE,
+    rmc.headername.sf = NULL,
+    rmc.headername.sn = NULL,
+    rmc.headername.recordingid = NULL,
+    rmc.header.structure = NULL,
+    rmc.check4timegaps = FALSE,
+    rmc.col.wear = NULL,
+    rmc.doresample = FALSE,
+    rmc.scalefactor.acc = 1,
     rmc.sf = 80L
-    # rmc.bitrate = NULL,
-    # rmc.dynamic_range = 6,
-    # rmc.unsignedbit = TRUE,
-    # rmc.origin = "1970-01-01",
-    # rmc.headername.sf = NULL,
-    # rmc.headername.sn = NULL,
-    # rmc.headername.recordingid = NULL,
-    # rmc.header.structure = NULL,
-    # rmc.check4timegaps = FALSE,
-    # rmc.noise = 13,
-    # rmc.col.wear = NULL,
-    # rmc.doresample = FALSE,
-    # rmc.scalefactor.acc = 1
   )
 }
 
