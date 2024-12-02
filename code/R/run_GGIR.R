@@ -31,48 +31,51 @@ for (index in seq(max_n)) {
 
 
 
-  GGIR::GGIR(
-    datadir = idf$csv_file,
-    outputdir = dir_output,
-    studyname = idf$id,
-    print.filename = TRUE,
-    desiredtz = "UTC",
-    configtz = "UTC",
-    sensor.location = "wrist",
-    verbose = TRUE,
-    minimumFileSizeMB = 0, # don't let small gz files be skipped
-    do.parallel = FALSE,
-    dynrange = 6L, # dynamic range of 6g (https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PAX80_G.htm)
-    idloc = 6, # file name gives the ID before the "."
+  res = try({
+    GGIR::GGIR(
+      datadir = idf$csv_file,
+      outputdir = dir_output,
+      studyname = idf$id,
+      print.filename = TRUE,
+      desiredtz = "UTC",
+      configtz = "UTC",
+      sensor.location = "wrist",
+      verbose = TRUE,
+      minimumFileSizeMB = 0, # don't let small gz files be skipped
+      do.parallel = FALSE,
+      dynrange = 6L, # dynamic range of 6g (https://wwwn.cdc.gov/Nchs/Nhanes/2011-2012/PAX80_G.htm)
+      idloc = 6, # file name gives the ID before the "."
 
-    #=====================
-    # read.myacc.csv arguments for reading in CSVS
-    #=====================
-    rmc.nrow = Inf,
-    rmc.skip = 0,
-    rmc.dec = ".",
-    rmc.firstrow.acc = 2,
-    rmc.firstrow.header = NULL,
-    rmc.header.length = NULL,
-    rmc.col.acc = 2:4,
-    rmc.col.temp = NULL,
-    rmc.col.time = 1,
-    rmc.unit.acc = "g",
-    rmc.unit.time = "character",
-    rmc.format.time = "%Y-%m-%dT%H:%M:%OS",
-    rmc.bitrate = NULL,
-    rmc.dynamic_range = 6,
-    rmc.unsignedbit = TRUE,
-    rmc.headername.sf = NULL,
-    rmc.headername.sn = NULL,
-    rmc.headername.recordingid = NULL,
-    rmc.header.structure = NULL,
-    rmc.check4timegaps = FALSE,
-    rmc.col.wear = NULL,
-    rmc.doresample = FALSE,
-    rmc.scalefactor.acc = 1,
-    rmc.sf = 80L
-  )
+      #=====================
+      # read.myacc.csv arguments for reading in CSVS
+      #=====================
+      rmc.nrow = Inf,
+      rmc.skip = 0,
+      rmc.dec = ".",
+      rmc.firstrow.acc = 2,
+      rmc.firstrow.header = NULL,
+      rmc.header.length = NULL,
+      rmc.col.acc = 2:4,
+      rmc.col.temp = NULL,
+      rmc.col.time = 1,
+      rmc.unit.acc = "g",
+      rmc.unit.time = "character",
+      rmc.format.time = "%Y-%m-%dT%H:%M:%OS",
+      rmc.bitrate = NULL,
+      rmc.dynamic_range = 6,
+      rmc.unsignedbit = TRUE,
+      rmc.headername.sf = NULL,
+      rmc.headername.sn = NULL,
+      rmc.headername.recordingid = NULL,
+      rmc.header.structure = NULL,
+      rmc.check4timegaps = FALSE,
+      rmc.col.wear = NULL,
+      rmc.doresample = FALSE,
+      rmc.scalefactor.acc = 1,
+      rmc.sf = 80L
+    )
+  })
+
 }
 
 
