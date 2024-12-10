@@ -64,7 +64,7 @@ Rnosave code/R/run_calibration.R -J CALIBRATE --array=1,2,4-9 --mem=35G -o %x_%A
 
 
 
-Rnosave code/R/run_GGIR.R -J GGIR --array=1-10 -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
+Rnosave code/R/run_GGIR.R -J GGIR --array=1-200 -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
 
 # Rnosave data/lily/code/run_adept.R -J ADEPT --nodes=1 --ntasks=1 --cpus-per-task=8  --array=11-20 --mem=100G -o %x_%A_%a.out -e %x_%A_%a.err

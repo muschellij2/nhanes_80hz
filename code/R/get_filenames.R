@@ -237,11 +237,28 @@ dfs = lapply(c("pax_h", "pax_g", "pax_y"), function(version) {
 })
 df = dplyr::bind_rows(dfs)
 
+output_GGIR = c(
+  "results/part2_daysummary.csv",
+  "results/part2_summary.csv",
+  "results/part4_nightsummary_sleep_cleaned.csv",
+  "results/part4_summary_sleep_cleaned.csv",
+  "results/part5_daysummary_MM_L40M100V400_T5A5.csv",
+  "results/part5_daysummary_WW_L40M100V400_T5A5.csv",
+  "results/part5_personsummary_MM_L40M100V400_T5A5.csv",
+  "results/part5_personsummary_WW_L40M100V400_T5A5.csv"
+)
+
+gdf = df %>%
+  select(id, version)
+ggir_files = outer(paste0("output_", df$id), output_GGIR, paste, sep ="/")
+colnames(ggir_files) = paste0("ggir_", sub("[.]csv.*", "", basename(output_GGIR)))
+df = bind_cols(df, ggir_files)
+
+
+# Add a fold column
 df = df %>%
   mutate(fold = seq(dplyr::n()),
          fold = floor(fold / ceiling(dplyr::n()/n_folds) + 1))
 readr::write_rds(df, here::here("data", "raw", "all_filenames.rds"))
-
-
 
 
