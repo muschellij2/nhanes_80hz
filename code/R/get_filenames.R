@@ -250,7 +250,8 @@ output_GGIR = c(
 
 gdf = df %>%
   select(id, version)
-ggir_files = outer(paste0("output_", df$id), output_GGIR, paste, sep ="/")
+ggir_files = outer(paste0("data/", "GGIR/", df$version, "/output_", df$id),
+                   output_GGIR, here::here)
 colnames(ggir_files) = paste0("ggir_", sub("[.]csv.*", "", basename(output_GGIR)))
 df = bind_cols(df, ggir_files)
 
