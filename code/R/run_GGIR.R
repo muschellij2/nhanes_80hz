@@ -17,6 +17,14 @@ if (!is.na(ifold)) {
     dplyr::filter(fold %in% ifold)
 }
 
+# ggir_files = df %>%
+#   select(id, starts_with("ggir_part"))
+# x = ggir_files %>%
+#   select(-id) %>%
+#   as.matrix()
+# res = array(file.exists(x), dim = dim(x), dimnames = dimnames(x))
+# file.remove(x[which(rowSums(!res) > 0),])
+
 # 64750
 max_n = nrow(df)
 index = 1

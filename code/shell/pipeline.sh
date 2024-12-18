@@ -73,6 +73,6 @@ Rnosave data/lily/code/run_adept_byrank.R -J ADEPT --nodes=1 --ntasks=1 --cpus-p
 # --exclude=compute-115
 # accProcess 62161.csv --csvTimeFormat 'yyyy-MM-dd HH:mm:ss.SSS' --csvTimeXYZTempColsIndex 0,1,2,3 --sampleRate 80
 # if we want wear time
-accProcess 62161.csv --csvTimeFormat 'yyyy-MM-dd HH:mm:ss.SSS' --csvTimeXYZTempColsIndex 0,1,2,3 --sampleRate 80 --deleteIntermediateFiles False
+accProcess 62467.csv.gz --timeZone UTC --csvTimeFormat 'yyyy-MM-dd HH:mm:ss.SSS' --csvTimeXYZTempColsIndex 0,1,2,3 --sampleRate 80 --deleteIntermediateFiles False --outputFolder ./test
 # --deleteIntermediateFiles False
 # --outputFolder ./test
