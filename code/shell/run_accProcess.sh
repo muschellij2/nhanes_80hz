@@ -9,7 +9,8 @@
 #SBATCH -o "%x_%A_%a.out"
 #SBATCH -e "%x_%A_%a.err"
 
-source ~/.bash_profile | true  # Load Python if needed
+module load conda_R/4.3.x
+# source ~/.bash_profile | true  # Load Python if needed
 conda activate accelerometer
 tempfile=$(mktemp)
 Rscript code/R/cat_csv_files.R  > $tempfile

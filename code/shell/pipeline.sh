@@ -70,6 +70,8 @@ Rnosave code/R/run_GGIR.R -J GGIR --array=1-200 -o %x_%A_%a.out -e %x_%A_%a.err 
 # Rnosave data/lily/code/run_adept.R -J ADEPT --nodes=1 --ntasks=1 --cpus-per-task=8  --array=11-20 --mem=100G -o %x_%A_%a.out -e %x_%A_%a.err
 Rnosave data/lily/code/run_adept_byrank.R -J ADEPT --nodes=1 --ntasks=1 --cpus-per-task=8  --array=11-20 --mem=100G -o %x_%A_%a.out -e %x_%A_%a.err
 
+sbatch code/shell/run_accProcess.sh
+
 # --exclude=compute-115
 # accProcess 62161.csv --csvTimeFormat 'yyyy-MM-dd HH:mm:ss.SSS' --csvTimeXYZTempColsIndex 0,1,2,3 --sampleRate 80
 # if we want wear time
