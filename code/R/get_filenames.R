@@ -116,20 +116,20 @@ get_version_filenames = function(nhanes_version) {
                                folder_name, id),
 
       time_csv_file = make_csv_name(paste0("time_csv", suffix),
-                               folder_name, id),
+                                    folder_name, id),
 
 
       calibrated_file = make_csv_name(paste0("gravity_calibrated", suffix),
-                               folder_name, id),
+                                      folder_name, id),
 
       calibration_params_file = make_csv_name(paste0("gravity_params", suffix),
-                                      folder_name, id),
+                                              folder_name, id),
 
       ggir_calibrated_file = make_csv_name(paste0("ggir_gravity_calibrated", suffix),
-                                      folder_name, id),
+                                           folder_name, id),
 
       ggir_calibration_params_file = make_csv_name(paste0("ggir_gravity_params", suffix),
-                                      folder_name, id),
+                                                   folder_name, id),
 
       acc_csv_file = make_csv_name(paste0("acc_csv", suffix),
                                    folder_name, id),
@@ -166,39 +166,39 @@ get_version_filenames = function(nhanes_version) {
   df = df %>%
     dplyr::mutate(
       stepcount_file = make_csv_name(paste0("stepcount", suffix),
-                               folder_name, id),
+                                     folder_name, id),
       stepcount_params_file = make_csv_name(paste0("stepcount_params", suffix),
-                                     folder_name, id),
+                                            folder_name, id),
       stepcount30_file = make_csv_name(paste0("stepcount_30", suffix),
-                                     folder_name, id),
+                                       folder_name, id),
       stepcount30_params_file = make_csv_name(paste0("stepcount_30_params", suffix),
-                                            folder_name, id)
+                                              folder_name, id)
     )
 
   df = df %>%
     dplyr::mutate(
       rf_stepcount_file = make_csv_name(paste0("rf_stepcount", suffix),
-                                     folder_name, id),
+                                        folder_name, id),
       rf_stepcount_params_file = make_csv_name(paste0("rf_stepcount_params", suffix),
-                                            folder_name, id),
-      rf_stepcount30_file = make_csv_name(paste0("rf_stepcount_30", suffix),
-                                       folder_name, id),
-      rf_stepcount30_params_file = make_csv_name(paste0("rf_stepcount30_params", suffix),
                                                folder_name, id),
+      rf_stepcount30_file = make_csv_name(paste0("rf_stepcount_30", suffix),
+                                          folder_name, id),
+      rf_stepcount30_params_file = make_csv_name(paste0("rf_stepcount30_params", suffix),
+                                                 folder_name, id),
     )
 
   df = df %>%
     dplyr::mutate(
       measures_file = make_csv_name(paste0("measures", suffix),
-                                        folder_name, id)
+                                    folder_name, id)
     )
 
   df = df %>%
     dplyr::mutate(
       acc_steps_1s_file = make_csv_name(paste0("acc_steps_1s", suffix),
-                                     folder_name, paste0(id, "1sec")),
+                                        folder_name, paste0(id, "1sec")),
       steps_1s_file = make_csv_name(paste0("steps_1s", suffix),
-                                     folder_name, id)
+                                    folder_name, id)
     )
 
 
@@ -207,7 +207,21 @@ get_version_filenames = function(nhanes_version) {
       nonwear_swan_file = make_csv_name(paste0("nonwear_swan", suffix),
                                         folder_name, id),
       nonwear_weartime_file = make_csv_name(paste0("nonwear_weartime", suffix),
-                                          folder_name, id)
+                                            folder_name, id)
+    )
+
+  ## accProcess outputs
+  df = df %>%
+    dplyr::mutate(
+      accProcess_epoch = make_csv_name(
+        "accProcess",
+        folder_name, paste0(id, "-epoch")),
+      accProcess_stationary_points = make_csv_name(
+        "accProcess",
+        folder_name, paste0(id, "-stationaryPoints")),
+      accProcess_time_series = make_csv_name(
+        "accProcess",
+        folder_name, paste0(id, "-timeSeries"))
     )
 
   df = df %>%
