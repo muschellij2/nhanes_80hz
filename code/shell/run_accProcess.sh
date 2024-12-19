@@ -10,8 +10,12 @@
 #SBATCH -e "%x_%A_%a.err"
 
 source ~/.bash_profile | true  # Load Python if needed
+echo "before activate conda env is $CONDA_DEFAULT_ENV"
 conda activate accelerometer
+echo "conda env is $CONDA_DEFAULT_ENV"
 conda activate accelerometer
+echo "conda env is $CONDA_DEFAULT_ENV"
+
 tempfile=$(mktemp)
 Rscript code/R/cat_csv_files.R  > $tempfile
 
