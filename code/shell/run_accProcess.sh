@@ -11,6 +11,7 @@
 
 source ~/.bash_profile | true  # Load Python if needed
 conda activate accelerometer
+conda activate accelerometer
 tempfile=$(mktemp)
 Rscript code/R/cat_csv_files.R  > $tempfile
 
