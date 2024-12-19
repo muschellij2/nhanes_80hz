@@ -24,6 +24,6 @@ while read -r line; do
   --csvTimeFormat 'yyyy-MM-dd HH:mm:ss.SSS' \
   --csvTimeXYZTempColsIndex 0,1,2,3 \
   --sampleRate 80 --deleteIntermediateFiles False \
-  --outputFolder data/accProcesse/$version
+  --outputFolder data/accProcess/$version
 done < $tempfile
 
