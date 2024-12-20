@@ -12,6 +12,7 @@
 source ~/.bash_profile | true  # Load Python if needed
 tempfile=$(mktemp)
 Rscript code/R/cat_csv_files.R  > $tempfile
+echo "Rscript run"
 
 module unload conda_R | true
 module load conda
