@@ -9,7 +9,7 @@
 #SBATCH -o "%x_%A_%a.out"
 #SBATCH -e "%x_%A_%a.err"
 
-. ~/.bash_profile | true  # Load Python if needed
+source ~/.bash_profile | true  # Load Python if needed
 tempfile=$(mktemp)
 Rscript code/R/cat_csv_files.R  > $tempfile
 
