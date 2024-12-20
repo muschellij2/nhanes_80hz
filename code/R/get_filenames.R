@@ -270,6 +270,11 @@ colnames(ggir_files) = paste0("ggir_", sub("[.]csv.*", "", basename(output_GGIR)
 df = bind_cols(df, ggir_files)
 
 
+files = df %>%
+  select(ends_with("_file"), starts_with("file"))
+dirs = unique(dirname(unlist(c(files))))
+fs::dir_create(dirs)
+
 # Add a fold column
 df = df %>%
   mutate(fold = seq(dplyr::n()),
