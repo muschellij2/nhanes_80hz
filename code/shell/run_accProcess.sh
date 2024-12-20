@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=accProcess
+#SBATCH --job-name=ACCPROCESS
 #SBATCH --array=1-200 # Replace with your desired number of tasks
 #SBATCH --cpus-per-task=1 # Adjust as needed
 #SBATCH --time=4-00:00:00  # time
