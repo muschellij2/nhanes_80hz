@@ -29,13 +29,13 @@ while read -r line; do
   --csvTimeFormat 'yyyy-MM-dd HH:mm:ss.SSS' \
   --csvTimeXYZTempColsIndex 0,1,2,3 \
   --verbose True \
-  --psd True \
-  --fourierFrequency True \
   --sampleRate 100 \
   --csvSampleRate 80 \
-  --m10l5 True \
   --deleteIntermediateFiles False \
   --outputFolder data/accProcess/$version
+  # --m10l5 True \
+  # --psd True \
+  # --fourierFrequency True \
 done < $tempfile
 
 /dcs05/ciprian/smart/nhanes_80hz/data/time_csv/pax_h/74344.csv.gz
