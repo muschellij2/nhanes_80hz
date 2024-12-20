@@ -10,6 +10,9 @@
 #SBATCH -e "%x_%A_%a.err"
 
 . ~/.bash_profile | true  # Load Python if needed
+tempfile=$(mktemp)
+Rscript code/R/cat_csv_files.R  > $tempfile
+
 module unload conda_R | true
 module load conda
 echo "before activate conda env is $CONDA_DEFAULT_ENV"
@@ -23,8 +26,7 @@ then
   exit 1
 fi
 
-tempfile=$(mktemp)
-Rscript code/R/cat_csv_files.R  > $tempfile
+
 
 
 while read -r line; do
