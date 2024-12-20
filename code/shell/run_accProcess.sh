@@ -10,12 +10,17 @@
 #SBATCH -e "%x_%A_%a.err"
 
 source ~/.bash_profile | true  # Load Python if needed
-module unload conda_R
+module unload conda_R | true
 echo "before activate conda env is $CONDA_DEFAULT_ENV"
 conda activate accelerometer
 echo "conda env is $CONDA_DEFAULT_ENV"
 conda activate accelerometer
 echo "conda env is $CONDA_DEFAULT_ENV"
+if [[ "$CONDA_DEFAULT_ENV" != "accelerometer" ]];
+then
+  echo "CONDA NOT WORKING"
+  exit 1
+fi
 
 tempfile=$(mktemp)
 Rscript code/R/cat_csv_files.R  > $tempfile
