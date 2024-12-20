@@ -38,4 +38,3 @@ while read -r line; do
   # --fourierFrequency True \
 done < $tempfile
 
-/dcs05/ciprian/smart/nhanes_80hz/data/time_csv/pax_h/74344.csv.gz
