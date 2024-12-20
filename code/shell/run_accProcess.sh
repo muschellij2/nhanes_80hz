@@ -28,7 +28,14 @@ while read -r line; do
   accProcess ${line} --timeZone UTC \
   --csvTimeFormat 'yyyy-MM-dd HH:mm:ss.SSS' \
   --csvTimeXYZTempColsIndex 0,1,2,3 \
-  --sampleRate 80 --deleteIntermediateFiles False \
+  --verbose True \
+  --psd True \
+  --fourierFrequency True \
+  --sampleRate 100 \
+  --csvSampleRate 80 \
+  --m10l5 True \
+  --deleteIntermediateFiles False \
   --outputFolder data/accProcess/$version
 done < $tempfile
 
+/dcs05/ciprian/smart/nhanes_80hz/data/time_csv/pax_h/74344.csv.gz
