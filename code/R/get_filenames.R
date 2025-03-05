@@ -206,6 +206,10 @@ get_version_filenames = function(nhanes_version) {
     dplyr::mutate(
       nonwear_swan_file = make_csv_name(paste0("nonwear_swan", suffix),
                                         folder_name, id),
+      nonwear_ac60_file = make_csv_name(paste0("nonwear_ac60", suffix),
+                                        folder_name, id),
+      sleep_ac60_file = make_csv_name(paste0("sleep_ac60", suffix),
+                                        folder_name, id),
       nonwear_weartime_file = make_csv_name(paste0("nonwear_weartime", suffix),
                                             folder_name, id)
     )

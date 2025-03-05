@@ -35,7 +35,7 @@ for (i in seq_len(nrow(df))) {
   file = idf$counts_60s_file
   print(file)
 
-  if (!file.exists(idf$nonwear_swan_file) && !idf$all_zero) {
+  if (!file.exists(idf$nonwear_ac60_file) && !idf$all_zero) {
     data = read_csv(file)
     data = data %>%
       rename(timestamp = HEADER_TIMESTAMP,
@@ -51,14 +51,27 @@ for (i in seq_len(nrow(df))) {
     tudor_locke_sadeh = actigraph.sleepr::apply_tudor_locke(sadeh)
     tudor_locke_cole_kripke = actigraph.sleepr::apply_tudor_locke(cole_kripke)
 
-    choi_df = purrr::map2_df(
-      choi_nonwear$period_start, choi_nonwear$period_end,
-      function(from, to) {
-        data.frame(timestamp = seq(from, to, by = 60L),
-                   choi_wear = FALSE)
-      })
-    data = left_join(data, choi_df) %>%
-      tidyr::replace_na(list(choi_wear = TRUE))
+    choi_df = convert_period_to_data(choi_nonwear, data = data)
+    choi_df = choi_df %>%
+      select(timestamp, choi_wear = wear)
+    troiano_df = convert_period_to_data(troiano_nonwear, data = data)
+    troiano_df = troiano_df %>%
+      select(timestamp, troiano_wear = wear)
+    sadeh_df = sadeh %>%
+      select(timestamp, sadeh_sleep = sleep)
+    ck_df = cole_kripke %>%
+      select(timestamp, cole_kripke_sleep = sleep)
 
+    res = full_join(choi_df, troiano_df)
+
+
+    res = res %>%
+      rename(HEADER_TIMESTAMP = timestamp)
+    write_csv_gz(res, idf$nonwear_ac60_file)
+
+    res = full_join(sadeh_df, ck_df)
+    res = res %>%
+      rename(HEADER_TIMESTAMP = timestamp)
+    write_csv_gz(res, idf$sleep_ac60_file)
   }
 }
