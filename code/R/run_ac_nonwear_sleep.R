@@ -35,7 +35,9 @@ for (i in seq_len(nrow(df))) {
   file = idf$counts_60s_file
   print(file)
 
-  if (!file.exists(idf$nonwear_ac60_file) && !idf$all_zero) {
+  if (!all(file.exists(c(
+    idf$nonwear_ac60_file,
+    idf$sleep_ac60_file))) && !idf$all_zero) {
     data = read_csv(file)
     data = data %>%
       rename(timestamp = HEADER_TIMESTAMP,
@@ -63,8 +65,6 @@ for (i in seq_len(nrow(df))) {
       select(timestamp, cole_kripke_sleep = sleep)
 
     res = full_join(choi_df, troiano_df)
-
-
     res = res %>%
       rename(HEADER_TIMESTAMP = timestamp)
     write_csv_gz(res, idf$nonwear_ac60_file)
