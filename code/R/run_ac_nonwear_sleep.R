@@ -1,4 +1,5 @@
-# Run nonwear detection using Choi's algorithm
+# Run nonwear detection using Choi/Troiano's algorithm and
+# sleep detection using Sadeh/Cole Kripke's algorithm.
 library(actigraph.sleepr)
 library(readr)
 library(dplyr)
