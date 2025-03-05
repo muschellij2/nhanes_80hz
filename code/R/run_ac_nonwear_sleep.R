@@ -48,8 +48,8 @@ for (i in seq_len(nrow(df))) {
     troiano_nonwear = actigraph.sleepr::apply_troiano(data, use_magnitude = TRUE)
     cole_kripke = actigraph.sleepr::apply_cole_kripke(data)
     sadeh = actigraph.sleepr::apply_sadeh(data)
-    tudor_locke_sadeh = actigraph.sleepr::apply_tudor_locke(sadeh)
-    tudor_locke_cole_kripke = actigraph.sleepr::apply_tudor_locke(cole_kripke)
+    # tudor_locke_sadeh = actigraph.sleepr::apply_tudor_locke(sadeh)
+    # tudor_locke_cole_kripke = actigraph.sleepr::apply_tudor_locke(cole_kripke)
 
     choi_df = convert_period_to_data(choi_nonwear, data = data)
     choi_df = choi_df %>%
