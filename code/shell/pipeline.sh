@@ -59,6 +59,10 @@ Rnosave code/R/run_nonwear_weartime.R -J WEARTIME --array=40,73,156 --mem=20G -o
 Rnosave code/R/run_nonwear_swan.R -J SWAN --array=8,18,39,110 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 # Rnosave code/R/run_nonwear_swan.R -J SWAN --array=1-64,66,74,84,88,89,92,93,110,118 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
+Rnosave code/R/run_ac_nonwear_sleep.R -J SLEEP --array=1-200 --mem=10G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
+
+
+
 Rnosave code/R/run_calibration.R -J CALIBRATE --array=1-200 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 Rnosave code/R/run_calibration.R -J CALIBRATE --array=1,2,4-9 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 

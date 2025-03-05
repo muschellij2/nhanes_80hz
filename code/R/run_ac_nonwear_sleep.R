@@ -75,5 +75,8 @@ for (i in seq_len(nrow(df))) {
       rename(HEADER_TIMESTAMP = timestamp)
     stopifnot(nrow(res) == nrow(data))
     write_csv_gz(res, idf$sleep_ac60_file)
+
+    rm(list = c("data", "res", "choi_df", "troiano_df", "sadeh_df",
+                "ck_df", "cole_kripke", "sadeh"))
   }
 }
