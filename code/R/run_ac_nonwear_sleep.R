@@ -67,11 +67,13 @@ for (i in seq_len(nrow(df))) {
     res = full_join(choi_df, troiano_df)
     res = res %>%
       rename(HEADER_TIMESTAMP = timestamp)
+    stopifnot(nrow(res) == nrow(data))
     write_csv_gz(res, idf$nonwear_ac60_file)
 
     res = full_join(sadeh_df, ck_df)
     res = res %>%
       rename(HEADER_TIMESTAMP = timestamp)
+    stopifnot(nrow(res) == nrow(data))
     write_csv_gz(res, idf$sleep_ac60_file)
   }
 }
