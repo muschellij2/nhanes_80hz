@@ -817,12 +817,17 @@ summarise_nhanes_80hz = function(
 
 
 convert_period_to_data = function(nonwear, data) {
-  nw_df = purrr::map2_df(
+  if (nrow(nonwear) > 0 ) {
+    nw_df = purrr::map2_df(
     nonwear$period_start, nonwear$period_end,
     function(from, to) {
       data.frame(timestamp = seq(from, to, by = 60L),
                  wear = FALSE)
     })
+  } else {
+    nw_df = tibble::tibble(timestamp = as.POSIXct(character(0)),
+                           wear = logical(0))
+  }
   data = dplyr::left_join(data, nw_df) %>%
     tidyr::replace_na(list(wear = TRUE))
 }
