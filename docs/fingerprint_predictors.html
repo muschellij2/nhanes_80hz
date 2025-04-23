@@ -100,6 +100,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Introduction</h1>
 <p>Here we will extract walking patterns from wrist, worn accelerometer data, and create predictors for fingerprinting.</p>
 </section>
+<section id="data" class="level1">
+<h1>Data</h1>
+</section>
 <section id="downloading-the-data" class="level1">
 <h1>Downloading the Data</h1>
 <p>Here we will download a tarball from the NHANES data set which has wrist worn accelerometer data. The data will be unzipped and aggregated to be read into a data set in R.</p>
@@ -204,22 +207,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>template_list <span class="ot">=</span> <span class="fu">do.call</span>(rbind, all_wrist_templates)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>template_list <span class="ot">=</span> <span class="fu">apply</span>(template_list, <span class="dv">1</span>, identity, <span class="at">simplify =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>We can now run ADEPT, which will usually take some time,</p>
+<p>We can now run ADEPT, which will usually take some time. You can run this in parallel using the arguments <code>run.parallel</code> and passing in the number of cores:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>walk_out <span class="ot">=</span> <span class="fu">segmentWalking</span>(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">%&gt;%</span> <span class="fu">select</span>(X, Y, Z),</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">xyz.fs =</span> sample_rate,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">template =</span> template_list, </span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">run.parallel =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">run.parallel.cores =</span> parallelly<span class="sc">::</span><span class="fu">availableCores</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>walk_out <span class="ot">=</span> <span class="fu">segmentWalking</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">%&gt;%</span> <span class="fu">select</span>(X, Y, Z),</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">xyz.fs =</span> sample_rate,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">template =</span> template_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">template =</span> template_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
+</section>
+<section id="fingerprinting-predictors" class="level1">
+<h1>Fingerprinting Predictors</h1>
 </section>
 
 </main>

@@ -130,6 +130,7 @@ template_list = apply(template_list, 1, identity, simplify = FALSE)
 We can now run ADEPT, which will usually take some time.  You can run this in parallel using the arguments `run.parallel` and passing in the number of cores:
 ```{r run_adept_show}
 #| eval: false
+#| echo: false
 walk_out = segmentWalking(
   data %>% select(X, Y, Z),
   xyz.fs = sample_rate,
