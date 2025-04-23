@@ -1,0 +1,151 @@
+---
+title: "Creating Fingerprint Predictors"
+format: html
+editor: source
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(readr)
+library(adept)
+library(adeptdata)
+library(knitr)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# Introduction
+Here we will extract walking patterns from wrist, worn accelerometer data, and create predictors for fingerprinting.
+
+
+
+# Data
+# Downloading the Data
+Here we will download a tarball from the NHANES data set which has wrist worn accelerometer data. The data will be unzipped and aggregated to be read into a data set in R.
+
+```{r download_data}
+#| cache: true
+url = "https://ftp.cdc.gov/pub/pax_g/62166.tar.bz2"
+tarball_file = file.path(tempdir(), basename(url))
+if (!file.exists(tarball_file)) {
+  curl::curl_download(url, tarball_file, quiet = FALSE)
+}
+
+
+col_types_80hz = vroom::cols(
+  # HEADER_TIMESTAMP = col_datetime_with_frac_secs(),
+  HEADER_TIMESTAMP = vroom::col_datetime(),
+  X = vroom::col_double(),
+  Y = vroom::col_double(),
+  Z = vroom::col_double()
+)
+
+tarball_df = function(
+    tarball_file,
+    cleanup = TRUE,
+    ...) {
+  ds = getOption("digits.secs")
+  on.exit({
+    options(digits.secs = ds)
+  }, add = TRUE)
+  options(digits.secs = 3)
+
+  tdir = tempfile()
+
+  # create a temporary directory to put the unzipped data
+  dir.create(tdir, showWarnings = TRUE)
+  exit_code = untar(tarfile = tarball_file, exdir = tdir, verbose = TRUE)
+  stopifnot(exit_code == 0)
+  if (cleanup) {
+    on.exit({
+      unlink(tdir, recursive = TRUE, force = TRUE)
+    }, add = TRUE)
+  }
+
+  # List out the files
+  files = list.files(path = tdir, full.names = FALSE, recursive = TRUE)
+  # Create metadata dataset that puts all the hourly files into a df
+
+  # get all the files in the tarball
+  files = list.files(path = tdir, full.names = TRUE)
+  # logs are different
+  included_log_file = files[grepl("_log", files, ignore.case = TRUE)]
+  stopifnot(length(included_log_file) <= 1)
+  if (length(included_log_file) == 1) {
+    log = readr::read_csv(included_log_file, progress = FALSE)
+  }
+
+  csv_files = files[!grepl("_log", files, ignore.case = TRUE)]
+  # Read in the Data:   HEADER_TIMESTAMP, X, Y, Z (col_types_80hz)
+  df = readr::read_csv(csv_files,
+                       col_types = col_types_80hz,
+                       progress = FALSE,
+                       ...)
+  list(
+    data = df,
+    log = log,
+    files = files
+  )
+}
+
+
+data = tarball_df(tarball_file)
+```
+
+The data is in the `data` object and we can see the strucutre:
+
+```{r data_extract}
+#| cache: true
+#| dependson: download_data
+data = data$data
+head(data)
+```
+
+
+We can estimate the sample rate from the times from the data, but we also know it is 80Hz, so we will pass that into the walking estimation.
+
+```{r time_extraction}
+times = data$HEADER_TIMESTAMP
+estimate_frequency = function(times) {
+  d = diff(times)
+  sample_rate = 1/as.numeric(mean(d))
+}
+
+sample_rate = 80L
+```
+
+## Running ADEPT
+
+The `adept` package will segment walking from the data.  We must pass it a number of templates to estimate walking from and these are provided in the `adeptdata` package:
+
+```{r templates}
+all_wrist_templates = adeptdata::stride_template$left_wrist
+template_list = do.call(rbind, all_wrist_templates)
+template_list = apply(template_list, 1, identity, simplify = FALSE)
+```
+
+We can now run ADEPT, which will usually take some time.  You can run this in parallel using the arguments `run.parallel` and passing in the number of cores:
+```{r run_adept_show}
+#| eval: false
+walk_out = segmentWalking(
+  data %>% select(X, Y, Z),
+  xyz.fs = sample_rate,
+  template = template_list, 
+  run.parallel = TRUE, 
+  run.parallel.cores = parallelly::availableCores())
+```
+
+```{r run_adept_run}
+#| cache: true
+walk_out = segmentWalking(
+  data %>% select(X, Y, Z),
+  xyz.fs = sample_rate,
+  template = template_list)
+```
+
+
+# Fingerprinting Predictors
+

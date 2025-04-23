@@ -34,3 +34,4 @@ stepcount_data
 pubs
 acctest
 
+docs/*_cache
