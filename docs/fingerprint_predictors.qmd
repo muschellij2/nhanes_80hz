@@ -2,6 +2,7 @@
 title: "Creating Fingerprint Predictors"
 format: html
 editor: source
+bibliography: refs.bib
 ---
 
 ```{r setup, include=FALSE}
@@ -10,6 +11,7 @@ library(readr)
 library(adept)
 library(adeptdata)
 library(knitr)
+library(slider)
 knitr::opts_chunk$set(
   echo = TRUE,
   message = FALSE,
@@ -26,15 +28,29 @@ Here we will extract walking patterns from wrist, worn accelerometer data, and c
 # Downloading the Data
 Here we will download a tarball from the NHANES data set which has wrist worn accelerometer data. The data will be unzipped and aggregated to be read into a data set in R.
 
-```{r download_data}
+```{r download_data_show}
 #| cache: true
+#| eval: false
 url = "https://ftp.cdc.gov/pub/pax_g/62166.tar.bz2"
 tarball_file = file.path(tempdir(), basename(url))
 if (!file.exists(tarball_file)) {
   curl::curl_download(url, tarball_file, quiet = FALSE)
 }
+```
 
+```{r download_data}
+#| echo: false
+url = "https://ftp.cdc.gov/pub/pax_g/62166.tar.bz2"
+tarball_file = here::here("docs", basename(url))
+if (!file.exists(tarball_file)) {
+  curl::curl_download(url, tarball_file, quiet = FALSE)
+}
+```
 
+Here we can create a simple function to unzip the file, read in the CSVs of the data and the log and return the results:
+
+```{r read_data}
+#| cache: true
 col_types_80hz = vroom::cols(
   # HEADER_TIMESTAMP = col_datetime_with_frac_secs(),
   HEADER_TIMESTAMP = vroom::col_datetime(),
@@ -52,9 +68,9 @@ tarball_df = function(
     options(digits.secs = ds)
   }, add = TRUE)
   options(digits.secs = 3)
-
+  
   tdir = tempfile()
-
+  
   # create a temporary directory to put the unzipped data
   dir.create(tdir, showWarnings = TRUE)
   exit_code = untar(tarfile = tarball_file, exdir = tdir, verbose = TRUE)
@@ -64,11 +80,11 @@ tarball_df = function(
       unlink(tdir, recursive = TRUE, force = TRUE)
     }, add = TRUE)
   }
-
+  
   # List out the files
   files = list.files(path = tdir, full.names = FALSE, recursive = TRUE)
   # Create metadata dataset that puts all the hourly files into a df
-
+  
   # get all the files in the tarball
   files = list.files(path = tdir, full.names = TRUE)
   # logs are different
@@ -77,13 +93,15 @@ tarball_df = function(
   if (length(included_log_file) == 1) {
     log = readr::read_csv(included_log_file, progress = FALSE)
   }
-
+  
   csv_files = files[!grepl("_log", files, ignore.case = TRUE)]
   # Read in the Data:   HEADER_TIMESTAMP, X, Y, Z (col_types_80hz)
   df = readr::read_csv(csv_files,
                        col_types = col_types_80hz,
                        progress = FALSE,
                        ...)
+  df = df %>% 
+    dplyr::rename(time = HEADER_TIMESTAMP)
   list(
     data = df,
     log = log,
@@ -93,14 +111,13 @@ tarball_df = function(
 
 
 data = tarball_df(tarball_file)
+logs = data$log
+data = data$data
 ```
 
-The data is in the `data` object and we can see the strucutre:
+The data is in the `data` object and we can see the structure:
 
 ```{r data_extract}
-#| cache: true
-#| dependson: download_data
-data = data$data
 head(data)
 ```
 
@@ -108,7 +125,7 @@ head(data)
 We can estimate the sample rate from the times from the data, but we also know it is 80Hz, so we will pass that into the walking estimation.
 
 ```{r time_extraction}
-times = data$HEADER_TIMESTAMP
+times = data$time
 estimate_frequency = function(times) {
   d = diff(times)
   sample_rate = 1/as.numeric(mean(d))
@@ -127,26 +144,160 @@ template_list = do.call(rbind, all_wrist_templates)
 template_list = apply(template_list, 1, identity, simplify = FALSE)
 ```
 
-We can now run ADEPT, which will usually take some time.  You can run this in parallel using the arguments `run.parallel` and passing in the number of cores:
+We can now run ADEPT, which will usually take some time.  We use the optimized parameters from the Indiana University data, which was shown in @koffman2024evaluating.   You can run this in parallel using the arguments `run.parallel` and passing in the number of cores.  
 ```{r run_adept_show}
+#| echo: true
 #| eval: false
-#| echo: false
 walk_out = segmentWalking(
   data %>% select(X, Y, Z),
   xyz.fs = sample_rate,
-  template = template_list, 
+  template = template_list,
   run.parallel = TRUE, 
-  run.parallel.cores = parallelly::availableCores())
+  run.parallel.cores = parallelly::availableCores(),
+  # Optimized parameter setting
+  sim_MIN = 0.6,
+  dur_MIN = 0.8,
+  dur_MAX = 1.4,
+  ptp_r_MIN = 0.5,
+  ptp_r_MAX = 2,
+  vmc_r_MIN = 0.05,
+  vmc_r_MAX = 0.5,
+  mean_abs_diff_med_p_MAX = 0.7,
+  mean_abs_diff_med_t_MAX = 0.2,
+  mean_abs_diff_dur_MAX = 0.3)
 ```
+
 
 ```{r run_adept_run}
 #| cache: true
-walk_out = segmentWalking(
-  data %>% select(X, Y, Z),
-  xyz.fs = sample_rate,
-  template = template_list)
+#| echo: false
+fname = here::here("docs", "fingerprint_walking.rds")
+if (!file.exists(fname)) {
+  walk_out = segmentWalking(
+    data %>% 
+      dplyr::select(X, Y, Z),
+    xyz.fs = sample_rate,
+    template = template_list,
+    run.parallel = TRUE, 
+    run.parallel.cores = parallelly::availableCores(),
+    # Optimized parameter setting
+    sim_MIN = 0.6,
+    dur_MIN = 0.8,
+    dur_MAX = 1.4,
+    ptp_r_MIN = 0.5,
+    ptp_r_MAX = 2,
+    vmc_r_MIN = 0.05,
+    vmc_r_MAX = 0.5,
+    mean_abs_diff_med_p_MAX = 0.7,
+    mean_abs_diff_med_t_MAX = 0.2,
+    mean_abs_diff_dur_MAX = 0.3)
+  readr::write_rds(walk_out, fname)
+} else {
+  walk_out = readr::read_rds(fname)
+}
 ```
+
 
 
 # Fingerprinting Predictors
 
+```{r}
+process_adept = function(output, data) {
+  step_result = output %>%
+    dplyr::filter(is_walking_i == 1) %>%
+    dplyr::mutate(steps = 2 / (T_i / sample_rate))
+  
+  steps_bysecond = data %>%
+    dplyr::mutate(tau_i = dplyr::row_number()) %>%
+    dplyr::left_join(step_result, by = dplyr::join_by(tau_i)) %>%
+    dplyr::mutate(
+      steps = ifelse(is.na(steps), 0, steps),
+      second = lubridate::floor_date(time, unit = "seconds")) %>%
+    dplyr::group_by(second) %>%
+    dplyr::summarize(steps = sum(steps), .groups = "drop")
+}
+
+steps_bysecond = process_adept(walk_out, data)
+```
+
+```{r get_windows}
+steps_bysecond = steps_bysecond %>% 
+  dplyr::mutate(
+    window_walk = slider::slide_int(steps > 0, sum, .before = 0, .after = 9),
+    # can have max 2 nos
+    window_walk = window_walk >= 8
+  )
+index = which(steps_bysecond$window_walk)
+index = sapply(index, function(x) {
+  x:(x + 9)
+})
+index = unique(sort(unlist(c(index))))
+index = index[index <= nrow(steps_bysecond)]
+steps_bysecond$window_walk[index] = TRUE
+```
+
+
+If we want the start/stop must be walking we can employ the following code to subset those.  We will not employ this as this is not the proposed method, but these may be desirable.
+
+```{r boxcar}
+#| eval: false
+# If we want the start/stop must be walking we can employ the following code:
+steps_bysecond = steps_bysecond %>% 
+  mutate(
+    window_walk = if_else(steps == 0 & window_walk, NA, window_walk)
+    ) %>% 
+  tidyr::fill(window_walk, .direction = "down") %>% 
+  tidyr::replace_na(list(window_walk = FALSE))
+steps_bysecond = steps_bysecond %>% 
+  mutate(
+    window_walk = if_else(steps == 0 & window_walk, NA, window_walk)
+    ) %>% 
+  tidyr::fill(window_walk, .direction = "up") %>% 
+  tidyr::replace_na(list(window_walk = FALSE))
+
+```
+
+
+`r knitr::knit_exit()`
+
+```{r}
+time_lag_seconds = c(0.15, 0.3, 0.45)
+time_lag_samples = round(time_lag_seconds * sample_rate)
+get_grid_data_lagsec = function(s, lag, data) {
+  # filter to one second
+  data %>% 
+    filter(second_id == s) %>%
+    dplyr::select(vm) %>%
+    mutate(lag_vm = dplyr::lag(vm, n = lag)) %>%   # for each second, calculate vm and lagged vm
+    mutate(
+      cut_sig = cut(
+        vm,
+        breaks = seq(0, max_vm, by = gcell_size),
+        include.lowest = T
+      ),
+      cut_lagsig = cut(
+        lag_vm,
+        breaks = seq(0, max_vm, by = gcell_size),
+        include.lowest = T
+      )
+    ) %>%
+    drop_na() %>% # count # points in each "grid cell"
+    count(cut_sig, cut_lagsig, .drop = FALSE) %>%
+    mutate(
+      lag = lag,
+      second_id = s,
+      cell = paste(cut_sig, cut_lagsig, lag, sep = "_")
+    ) %>%
+    dplyr::select(n, second_id, cell)
+}
+
+sample_rate = 80L
+time_lags = c(12L, 24L, 36L)
+gcell_size = 0.25
+```
+
+
+
+
+Raw data to seconds walking yes/no.
+Call a bout if 
