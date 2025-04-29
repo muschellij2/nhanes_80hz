@@ -17,6 +17,7 @@ knitr::opts_chunk$set(
   message = FALSE,
   warning = FALSE
 )
+options(digits.secs = 3)
 ```
 
 # Introduction
@@ -202,8 +203,9 @@ if (!file.exists(fname)) {
 # Fingerprinting Predictors
 
 ```{r}
-process_adept = function(output, data) {
+process_adept = function(output, data, sample_rate) {
   step_result = output %>%
+    # all steps where walking == 0 are set to zero!
     dplyr::filter(is_walking_i == 1) %>%
     dplyr::mutate(steps = 2 / (T_i / sample_rate))
   
@@ -217,8 +219,33 @@ process_adept = function(output, data) {
     dplyr::summarize(steps = sum(steps), .groups = "drop")
 }
 
-steps_bysecond = process_adept(walk_out, data)
+steps_bysecond = process_adept(walk_out, data, sample_rate = sample_rate)
 ```
+
+```{r}
+walking_df = steps_bysecond %>% 
+  filter(steps > 0) %>% 
+  mutate(day = lubridate::floor_date(second, unit = "1 day"))
+bouts = walking_df %>%
+  select(second, day) %>%
+  distinct() %>%
+  mutate(timediff = as.numeric(difftime(second, dplyr::lag(second, n = 1), units = "secs")),
+         ltwosec = (timediff <= 2)*1,
+         rleid = data.table::rleid(ltwosec)) %>%
+  filter(ltwosec == 1) %>%
+  group_by(rleid, day) %>%
+  mutate(n_seconds = n(),
+         start = min(second),
+         end = max(second)) %>% 
+  ungroup() 
+bouts %>%
+  filter(n_seconds >= 10) %>% 
+  select(second)
+bouts %>% 
+  distinct(rleid, day, n_seconds, start, end)
+
+```
+
 
 ```{r get_windows}
 steps_bysecond = steps_bysecond %>% 
@@ -245,13 +272,13 @@ If we want the start/stop must be walking we can employ the following code to su
 steps_bysecond = steps_bysecond %>% 
   mutate(
     window_walk = if_else(steps == 0 & window_walk, NA, window_walk)
-    ) %>% 
+  ) %>% 
   tidyr::fill(window_walk, .direction = "down") %>% 
   tidyr::replace_na(list(window_walk = FALSE))
 steps_bysecond = steps_bysecond %>% 
   mutate(
     window_walk = if_else(steps == 0 & window_walk, NA, window_walk)
-    ) %>% 
+  ) %>% 
   tidyr::fill(window_walk, .direction = "up") %>% 
   tidyr::replace_na(list(window_walk = FALSE))
 
@@ -261,6 +288,10 @@ steps_bysecond = steps_bysecond %>%
 `r knitr::knit_exit()`
 
 ```{r}
+calculate_vm = function(df) {
+  df = df %>% 
+    dplyr::mutate(vm = sqrt(X^2 + Y^2 + Z^2))
+}
 time_lag_seconds = c(0.15, 0.3, 0.45)
 time_lag_samples = round(time_lag_seconds * sample_rate)
 get_grid_data_lagsec = function(s, lag, data) {

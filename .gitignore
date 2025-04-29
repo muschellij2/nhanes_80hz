@@ -33,5 +33,6 @@ stepcount_data
 *.out
 pubs
 acctest
-
 docs/*_cache
+docs/*.tar.bz2
+docs/fingerprint_walking.rds
