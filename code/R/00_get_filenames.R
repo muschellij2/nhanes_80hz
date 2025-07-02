@@ -195,6 +195,7 @@ get_version_filenames = function(nhanes_version) {
 
   df = df %>%
     dplyr::mutate(
+      # From ActiLife (outside of code)
       acc_steps_1s_file = make_csv_name(paste0("acc_steps_1s", suffix),
                                         folder_name, paste0(id, "1sec")),
       steps_1s_file = make_csv_name(paste0("steps_1s", suffix),

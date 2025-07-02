@@ -203,14 +203,14 @@ div.csl-indent {
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 4
-  time                    X      Y     Z
-  &lt;dttm&gt;              &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
-1 2000-01-08 12:30:00 0.909 -0.396 0.255
-2 2000-01-08 12:30:00 0.859 -0.396 0.229
-3 2000-01-08 12:30:00 0.862 -0.408 0.22 
-4 2000-01-08 12:30:00 0.93  -0.422 0.238
-5 2000-01-08 12:30:00 0.944 -0.425 0.246
-6 2000-01-08 12:30:00 0.912 -0.437 0.267</code></pre>
+  time                        X      Y     Z
+  &lt;dttm&gt;                  &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
+1 2000-01-08 12:30:00.000 0.909 -0.396 0.255
+2 2000-01-08 12:30:00.013 0.859 -0.396 0.229
+3 2000-01-08 12:30:00.024 0.862 -0.408 0.22 
+4 2000-01-08 12:30:00.037 0.93  -0.422 0.238
+5 2000-01-08 12:30:00.049 0.944 -0.425 0.246
+6 2000-01-08 12:30:00.062 0.912 -0.437 0.267</code></pre>
 </div>
 </div>
 <p>We can estimate the sample rate from the times from the data, but we also know it is 80Hz, so we will pass that into the walking estimation.</p>
@@ -256,53 +256,109 @@ div.csl-indent {
 <section id="fingerprinting-predictors" class="level1">
 <h1>Fingerprinting Predictors</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>process_adept <span class="ot">=</span> <span class="cf">function</span>(output, data) {</span>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>process_adept <span class="ot">=</span> <span class="cf">function</span>(output, data, sample_rate) {</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  step_result <span class="ot">=</span> output <span class="sc">%&gt;%</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(is_walking_i <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">steps =</span> <span class="dv">2</span> <span class="sc">/</span> (T_i <span class="sc">/</span> sample_rate))</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  steps_bysecond <span class="ot">=</span> data <span class="sc">%&gt;%</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">tau_i =</span> dplyr<span class="sc">::</span><span class="fu">row_number</span>()) <span class="sc">%&gt;%</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">left_join</span>(step_result, <span class="at">by =</span> dplyr<span class="sc">::</span><span class="fu">join_by</span>(tau_i)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">steps =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(steps), <span class="dv">0</span>, steps),</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">second =</span> lubridate<span class="sc">::</span><span class="fu">floor_date</span>(time, <span class="at">unit =</span> <span class="st">"seconds"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">group_by</span>(second) <span class="sc">%&gt;%</span></span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarize</span>(<span class="at">steps =</span> <span class="fu">sum</span>(steps), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>steps_bysecond <span class="ot">=</span> <span class="fu">process_adept</span>(walk_out, data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># all steps where walking == 0 are set to zero!</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(is_walking_i <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">steps =</span> <span class="dv">2</span> <span class="sc">/</span> (T_i <span class="sc">/</span> sample_rate))</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  steps_bysecond <span class="ot">=</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">tau_i =</span> dplyr<span class="sc">::</span><span class="fu">row_number</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">left_join</span>(step_result, <span class="at">by =</span> dplyr<span class="sc">::</span><span class="fu">join_by</span>(tau_i)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">steps =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(steps), <span class="dv">0</span>, steps),</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">second =</span> lubridate<span class="sc">::</span><span class="fu">floor_date</span>(time, <span class="at">unit =</span> <span class="st">"seconds"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">group_by</span>(second) <span class="sc">%&gt;%</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">summarize</span>(<span class="at">steps =</span> <span class="fu">sum</span>(steps), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>steps_bysecond <span class="ot">=</span> <span class="fu">process_adept</span>(walk_out, data, <span class="at">sample_rate =</span> sample_rate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>steps_bysecond <span class="ot">=</span> steps_bysecond <span class="sc">%&gt;%</span> </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">window_walk =</span> slider<span class="sc">::</span><span class="fu">slide_int</span>(steps <span class="sc">&gt;</span> <span class="dv">0</span>, sum, <span class="at">.before =</span> <span class="dv">0</span>, <span class="at">.after =</span> <span class="dv">9</span>),</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># can have max 2 nos</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">window_walk =</span> window_walk <span class="sc">&gt;=</span> <span class="dv">8</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>index <span class="ot">=</span> <span class="fu">which</span>(steps_bysecond<span class="sc">$</span>window_walk)</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>index <span class="ot">=</span> <span class="fu">sapply</span>(index, <span class="cf">function</span>(x) {</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  x<span class="sc">:</span>(x <span class="sc">+</span> <span class="dv">9</span>)</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>})</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>index <span class="ot">=</span> <span class="fu">unique</span>(<span class="fu">sort</span>(<span class="fu">unlist</span>(<span class="fu">c</span>(index))))</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>index <span class="ot">=</span> index[index <span class="sc">&lt;=</span> <span class="fu">nrow</span>(steps_bysecond)]</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>steps_bysecond<span class="sc">$</span>window_walk[index] <span class="ot">=</span> <span class="cn">TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>walking_df <span class="ot">=</span> steps_bysecond <span class="sc">%&gt;%</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(steps <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">day =</span> lubridate<span class="sc">::</span><span class="fu">floor_date</span>(second, <span class="at">unit =</span> <span class="st">"1 day"</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>bouts <span class="ot">=</span> walking_df <span class="sc">%&gt;%</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(second, day) <span class="sc">%&gt;%</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">timediff =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(second, dplyr<span class="sc">::</span><span class="fu">lag</span>(second, <span class="at">n =</span> <span class="dv">1</span>), <span class="at">units =</span> <span class="st">"secs"</span>)),</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">ltwosec =</span> (timediff <span class="sc">&lt;=</span> <span class="dv">2</span>)<span class="sc">*</span><span class="dv">1</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">rleid =</span> data.table<span class="sc">::</span><span class="fu">rleid</span>(ltwosec)) <span class="sc">%&gt;%</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(ltwosec <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(rleid, day) <span class="sc">%&gt;%</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">n_seconds =</span> <span class="fu">n</span>(),</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">start =</span> <span class="fu">min</span>(second),</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">end =</span> <span class="fu">max</span>(second)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() </span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>bouts <span class="sc">%&gt;%</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n_seconds <span class="sc">&gt;=</span> <span class="dv">10</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(second)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 146 × 1
+   second                 
+   &lt;dttm&gt;                 
+ 1 2000-01-09 13:35:17.000
+ 2 2000-01-09 13:35:18.000
+ 3 2000-01-09 13:35:19.000
+ 4 2000-01-09 13:35:21.000
+ 5 2000-01-09 13:35:22.000
+ 6 2000-01-09 13:35:23.000
+ 7 2000-01-09 13:35:24.000
+ 8 2000-01-09 13:35:25.000
+ 9 2000-01-09 13:35:26.000
+10 2000-01-09 13:35:28.000
+# ℹ 136 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>bouts <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(rleid, day, n_seconds, start, end)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1,039 × 5
+   rleid day                     n_seconds start                  
+   &lt;int&gt; &lt;dttm&gt;                      &lt;int&gt; &lt;dttm&gt;                 
+ 1     2 2000-01-08 00:00:00.000         6 2000-01-08 12:31:26.000
+ 2     4 2000-01-08 00:00:00.000         2 2000-01-08 12:32:37.000
+ 3     6 2000-01-08 00:00:00.000         2 2000-01-08 12:33:33.000
+ 4     8 2000-01-08 00:00:00.000         2 2000-01-08 12:34:23.000
+ 5    10 2000-01-08 00:00:00.000         3 2000-01-08 12:34:49.000
+ 6    12 2000-01-08 00:00:00.000         2 2000-01-08 12:35:55.000
+ 7    14 2000-01-08 00:00:00.000         4 2000-01-08 12:37:24.000
+ 8    16 2000-01-08 00:00:00.000         4 2000-01-08 12:59:55.000
+ 9    18 2000-01-08 00:00:00.000         2 2000-01-08 13:02:28.000
+10    20 2000-01-08 00:00:00.000         2 2000-01-08 13:02:33.000
+# ℹ 1,029 more rows
+# ℹ 1 more variable: end &lt;dttm&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>steps_bysecond <span class="ot">=</span> steps_bysecond <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">window_walk =</span> slider<span class="sc">::</span><span class="fu">slide_int</span>(steps <span class="sc">&gt;</span> <span class="dv">0</span>, sum, <span class="at">.before =</span> <span class="dv">0</span>, <span class="at">.after =</span> <span class="dv">9</span>),</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># can have max 2 nos</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">window_walk =</span> window_walk <span class="sc">&gt;=</span> <span class="dv">8</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>index <span class="ot">=</span> <span class="fu">which</span>(steps_bysecond<span class="sc">$</span>window_walk)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>index <span class="ot">=</span> <span class="fu">sapply</span>(index, <span class="cf">function</span>(x) {</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  x<span class="sc">:</span>(x <span class="sc">+</span> <span class="dv">9</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>index <span class="ot">=</span> <span class="fu">unique</span>(<span class="fu">sort</span>(<span class="fu">unlist</span>(<span class="fu">c</span>(index))))</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>index <span class="ot">=</span> index[index <span class="sc">&lt;=</span> <span class="fu">nrow</span>(steps_bysecond)]</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>steps_bysecond<span class="sc">$</span>window_walk[index] <span class="ot">=</span> <span class="cn">TRUE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>If we want the start/stop must be walking we can employ the following code to subset those. We will not employ this as this is not the proposed method, but these may be desirable.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If we want the start/stop must be walking we can employ the following code:</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>steps_bysecond <span class="ot">=</span> steps_bysecond <span class="sc">%&gt;%</span> </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">window_walk =</span> <span class="fu">if_else</span>(steps <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> window_walk, <span class="cn">NA</span>, window_walk)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">fill</span>(window_walk, <span class="at">.direction =</span> <span class="st">"down"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">window_walk =</span> <span class="cn">FALSE</span>))</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>steps_bysecond <span class="ot">=</span> steps_bysecond <span class="sc">%&gt;%</span> </span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">window_walk =</span> <span class="fu">if_else</span>(steps <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> window_walk, <span class="cn">NA</span>, window_walk)</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">fill</span>(window_walk, <span class="at">.direction =</span> <span class="st">"up"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">window_walk =</span> <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If we want the start/stop must be walking we can employ the following code:</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>steps_bysecond <span class="ot">=</span> steps_bysecond <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">window_walk =</span> <span class="fu">if_else</span>(steps <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> window_walk, <span class="cn">NA</span>, window_walk)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">fill</span>(window_walk, <span class="at">.direction =</span> <span class="st">"down"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">window_walk =</span> <span class="cn">FALSE</span>))</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>steps_bysecond <span class="ot">=</span> steps_bysecond <span class="sc">%&gt;%</span> </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">window_walk =</span> <span class="fu">if_else</span>(steps <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> window_walk, <span class="cn">NA</span>, window_walk)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">fill</span>(window_walk, <span class="at">.direction =</span> <span class="st">"up"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">window_walk =</span> <span class="cn">FALSE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 </section>
