@@ -36,11 +36,18 @@ for (index in seq(max_n)) {
     counts_file = idf$counts_file,
     measures_file = idf$measures_file
   )
+  # force re-run if MIMS_UNIT not found
+  if (file.exists(idf$measures_file)) {
+    x = readr::read_csv(idf$measures_file)
+    if (!"MIMS_UNIT" %in% colnames(x)) {
+      file.remove(idf$measures_file)
+    }
+  }
 
   if (
     (!all(file.exists(unlist(files))) && file.exists(idf$csv_file)) ||
     force
-    ) {
+  ) {
     x = try({
       summarise_nhanes_80hz(
         csv_file = files$csv_file,
