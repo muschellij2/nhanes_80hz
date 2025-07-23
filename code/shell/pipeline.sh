@@ -36,8 +36,11 @@ Rnosave code/R/write_acc_csv.R -N ACC_CSV -t 18 -l mem_free=12G,h_vmem=12G
 
 
 
+
 Rnosave code/R/resample_data.R -N RESAMPLE -t 1-200 -l mem_free=22G,h_vmem=22G
 Rnosave code/R/resample_data.R -J RESAMPLE --array=1-100 --mem=22G -o %x_%A_%a.out -e %x_%A_%a.err
+Rnosave code/R/05_output_run_process.R -J PROC --array=1-200 --mem=40G -o %x_%A_%a.out -e %x_%A_%a.err
+
 # Rnosave code/R/resample_data.R -J RESAMPLE --array=1-200 --mem=30G -o %x_%A_%a.out -e %x_%A_%a.err
 
 Rnosave code/R/split_daily_minutely.R -N SPLIT -l mem_free=20G,h_vmem=21G
