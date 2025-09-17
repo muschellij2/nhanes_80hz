@@ -50,6 +50,7 @@ for (index in seq(max_n)) {
     out = MIMSunit::mims_unit(
       data,
       epoch = "1 min",
+      output_mims_per_axis = TRUE,
       dynamic_range = c(-6L, 6L)
     )
     write_csv_gz(out, idf$file_mims)
