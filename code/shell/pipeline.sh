@@ -19,8 +19,8 @@ Rnosave code/R/copy_csv_with_new_header.R -J COPIER --array=1-200 --mem=10G -o %
 # else
 #   dependency=
 # fi
-# Rnosave code/R/tarball_to_csv.R -N PROC --array=1-200 --mem=21G ${dependency}
-Rnosave code/R/resample_data.R -J PROC --array=1-200  --mem=22G ${dependency}
+# Rnosave code/R/tarball_to_csv.R -N TAR --array=1-200 --mem=21G ${dependency}
+Rnosave code/R/resample_data.R -J RESAMPLE --array=1-200  --mem=22G ${dependency}
 Rnosave code/R/check_output_csv.R -J CHECK --array=1-200 -o %x_%A_%a.out -e %x_%A_%a.err
 
 
@@ -71,7 +71,7 @@ Rnosave code/R/run_ac_nonwear_sleep.R -J SLEEP --array=1-200 --mem=10G -o %x_%A_
 Rnosave code/R/run_calibration.R -J CALIBRATE --array=1-200 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 Rnosave code/R/run_calibration.R -J CALIBRATE --array=1,2,4-9 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
-Rnosave code/R/999_quick_mims.R -J MIMS --mem=50G -o %x_%A.out -e %x_%A.err --time=4-00:00:00
+Rnosave code/R/999_quick_mims.R -J MIMS --mem=45G -o %x_%A.out -e %x_%A.err --time=4-00:00:00
 
 
 Rnosave code/R/run_GGIR.R -J GGIR --array=1-200 -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00

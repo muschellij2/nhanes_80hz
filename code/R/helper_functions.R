@@ -125,8 +125,8 @@ get_meta_df = function(raw) {
 
 tarball_df = function(
     tarball_file,
-    log_file,
-    meta_file,
+    log_file = NULL,
+    meta_file = NULL,
     num_threads = 1,
     ...) {
   ds = getOption("digits.secs")
@@ -134,8 +134,6 @@ tarball_df = function(
     options(digits.secs = ds)
   }, add = TRUE)
   options(digits.secs = 3)
-  dir.create(dirname(log_file), showWarnings = FALSE, recursive = TRUE)
-  dir.create(dirname(meta_file), showWarnings = FALSE, recursive = TRUE)
   tdir = tempfile()
 
   # create a temporary directory to put the unzipped data
@@ -147,17 +145,24 @@ tarball_df = function(
   files = list.files(path = tdir, full.names = FALSE, recursive = TRUE)
   # Create metadata dataset that puts all the hourly files into a df
   meta_df = make_meta_df_from_files(files)
-  readr::write_csv(meta_df, file = meta_file, num_threads = num_threads)
+
+  if (!is.null(meta_file)) {
+    dir.create(dirname(meta_file), showWarnings = FALSE, recursive = TRUE)
+    readr::write_csv(meta_df, file = meta_file, num_threads = num_threads)
+  }
 
   # get all the files in the tarball
   files = list.files(path = tdir, full.names = TRUE)
   # logs are different
-  included_log_file = files[grepl("_log", files, ignore.case = TRUE)]
-  stopifnot(length(included_log_file) <= 1)
-  if (length(included_log_file) == 1) {
-    R.utils::gzip(included_log_file, destname = log_file,
-                  remove = FALSE, overwrite = TRUE,
-                  compression = 9)
+  if (!is.null(log_file)) {
+    dir.create(dirname(log_file), showWarnings = FALSE, recursive = TRUE)
+    included_log_file = files[grepl("_log", files, ignore.case = TRUE)]
+    stopifnot(length(included_log_file) <= 1)
+    if (length(included_log_file) == 1) {
+      R.utils::gzip(included_log_file, destname = log_file,
+                    remove = FALSE, overwrite = TRUE,
+                    compression = 9)
+    }
   }
   csv_files = files[!grepl("_log", files, ignore.case = TRUE)]
   # Read in the Data:   HEADER_TIMESTAMP, X, Y, Z (col_types_80hz)
@@ -819,11 +824,11 @@ summarise_nhanes_80hz = function(
 convert_period_to_data = function(nonwear, data) {
   if (nrow(nonwear) > 0 ) {
     nw_df = purrr::map2_df(
-    nonwear$period_start, nonwear$period_end,
-    function(from, to) {
-      data.frame(timestamp = seq(from, to, by = 60L),
-                 wear = FALSE)
-    })
+      nonwear$period_start, nonwear$period_end,
+      function(from, to) {
+        data.frame(timestamp = seq(from, to, by = 60L),
+                   wear = FALSE)
+      })
   } else {
     nw_df = tibble::tibble(timestamp = as.POSIXct(character(0)),
                            wear = logical(0))

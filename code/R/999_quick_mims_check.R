@@ -21,14 +21,21 @@ df = df %>%
 df = df %>%
   filter(file.exists(file_mims))
 
-iid = 2
-# for (iid in seq(nrow(df))) {
+iid = 1
+for (iid in seq(nrow(df))) {
   idf = df[iid,]
   print(paste0(iid, " of ", nrow(df)))
 
   print(idf$measures_file)
-  measures = read_csv(idf$measures_file)
-  mims = read_csv(idf$file_mims)
+  measures = read_csv(idf$measures_file, progress = FALSE, show_col_types = FALSE)
+  if ("MIMS_UNIT" %in% colnames(measures)) {
+    measures = measures %>%
+      select(time = HEADER_TIMESTAMP, MIMS_UNIT)
+    mims = read_csv(idf$file_mims, progress = FALSE, show_col_types = FALSE) %>%
+      select(time = HEADER_TIME_STAMP, MIMS_UNIT)
+    stopifnot(isTRUE(all.equal(measures, mims)))
+  } else {
+    print("skipping")
+  }
 
-
-# }
+}
