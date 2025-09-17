@@ -36,7 +36,7 @@ Rnosave code/R/write_acc_csv.R -N ACC_CSV -t 18 -l mem_free=12G,h_vmem=12G
 
 
 
-Rnosave code/R/05_output_get_counts_from30Hz.R -J COUNTS --array=1-100 --mem=22G -o %x_%A_%a.out -e %x_%A_%a.err
+Rnosave code/R/05_output_get_counts_from30Hz.R -J COUNTS --array=1-200 --mem=22G -o %x_%A_%a.out -e %x_%A_%a.err
 
 
 # Rnosave code/R/resample_data.R -N RESAMPLE -t 1-200 -l mem_free=22G,h_vmem=22G
@@ -71,6 +71,7 @@ Rnosave code/R/run_ac_nonwear_sleep.R -J SLEEP --array=1-200 --mem=10G -o %x_%A_
 Rnosave code/R/run_calibration.R -J CALIBRATE --array=1-200 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 Rnosave code/R/run_calibration.R -J CALIBRATE --array=1,2,4-9 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
+Rnosave code/R/999_quick_mims.R -J MIMS --mem=50G -o %x_%A.out -e %x_%A.err --time=4-00:00:00
 
 
 Rnosave code/R/run_GGIR.R -J GGIR --array=1-200 -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00

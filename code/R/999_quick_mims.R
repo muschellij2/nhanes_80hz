@@ -12,7 +12,8 @@ rm(list = c("fold"))
 df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 xdf = df
 
-ids = c("80520", "80441", "80559", "74694", "74312", "74445", "74682",
+ids = c("73557", "73558", "73559", "73560", "73561",
+          "80520", "80441", "80559", "74694", "74312", "74445", "74682",
         "80517", "74752", "74324")
 df = df %>%
   filter(id %in% ids)
@@ -20,7 +21,7 @@ df = df %>%
 df = df %>%
   dplyr::mutate(
     file_mims = here::here("data", "mims", version, paste0(id, ".csv.gz"))
-    )
+  )
 
 
 # ifold = get_fold()
