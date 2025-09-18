@@ -12,24 +12,26 @@ rm(list = c("fold"))
 df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 xdf = df
 
-ids = c("73557", "73558", "73559", "73560", "73561",
-          "80520", "80441", "80559", "74694", "74312", "74445", "74682",
-        "80517", "74752", "74324")
-df = df %>%
-  filter(id %in% ids)
+# ids = c("73557", "73558", "73559", "73560", "73561",
+#           "80520", "80441", "80559", "74694", "74312", "74445", "74682",
+#         "80517", "74752", "74324")
+# df = df %>%
+#   filter(id %in% ids)
 
+allow_truncation = FALSE
+name_folder = ifelse(allow_truncation, "mims_truncation", "mims")
 df = df %>%
   dplyr::mutate(
-    file_mims = here::here("data", "mims", version, paste0(id, ".csv.gz"))
+    file_mims = here::here("data", name_folder, version, paste0(id, ".csv.gz"))
   )
 
 
-# ifold = get_fold()
-#
-# if (!is.na(ifold)) {
-#   df = df %>%
-#     dplyr::filter(fold %in% ifold)
-# }
+ifold = get_fold()
+
+if (!is.na(ifold)) {
+  df = df %>%
+    dplyr::filter(fold %in% ifold)
+}
 force = FALSE
 
 max_n = nrow(df)
@@ -47,11 +49,12 @@ for (index in seq(max_n)) {
     data = read_80hz(idf$csv_file)
     data = data %>%
       rename(HEADER_TIME_STAMP = HEADER_TIMESTAMP)
-    out = MIMSunit::mims_unit(
+    out = MIMSunit::custom_mims_unit(
       data,
       epoch = "1 min",
       output_mims_per_axis = TRUE,
-      dynamic_range = c(-6L, 6L)
+      dynamic_range = c(-6L, 6L),
+      allow_truncation = allow_truncation
     )
     write_csv_gz(out, idf$file_mims)
   }

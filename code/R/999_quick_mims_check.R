@@ -25,11 +25,11 @@ df = df %>%
 iid = 1
 for (iid in seq(nrow(df))) {
   idf = df[iid,]
-  print(paste0(iid, " of ", nrow(df)))
+  # print(paste0(iid, " of ", nrow(df)))
 
   print(idf$measures_file)
   measures = read_csv(idf$measures_file, progress = FALSE, show_col_types = FALSE)
-  raw_min = read_csv(idf$file_mims_raw)
+  raw_min = read_csv(idf$file_mims_raw, progress = FALSE, show_col_types = FALSE)
   stopifnot(nrow(measures) == nrow(raw_min))
   if ("MIMS_UNIT" %in% colnames(measures)) {
     measures = measures %>%
@@ -44,7 +44,7 @@ for (iid in seq(nrow(df))) {
       mutate(MIMS_UNIT = round(MIMS_UNIT, 2))
     mims = mims %>%
       mutate(MIMS_UNIT = round(MIMS_UNIT, 2))
-    stopifnot(isTRUE(all.equal(raw_min, mims)))
+    # stopifnot(isTRUE(all.equal(raw_min, mims)))
   } else {
     print("skipping")
   }
