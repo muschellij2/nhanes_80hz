@@ -33,9 +33,10 @@ xpts = tibble(
 
 ss = split(xpts$outfile, xpts$version)
 
+df$n_values = df$n_bad = NA
+
 max_n = nrow(df)
 index = 1
-
 for (index in seq(max_n)) {
   # print(index)
   idf = df[index,]
@@ -66,11 +67,17 @@ for (index in seq(max_n)) {
              pct_diff)
 
     head(paxmims)
-
-    stopifnot(all(paxmims$pct_diff < 1.5 | paxmims$diff < 0.1))
-
+    good = paxmims$pct_diff < 1 | paxmims$diff < 0.1
+    df$n_values[index] = nrow(paxmims)
+    df$n_bad[index] = sum(!good)
+    print(sum(!good))
   }
 }
+
+out = df %>%
+  select(id, version, n_values, n_bad)
+fname = here::here("data", "mims_comparison_check.rds")
+readr::write_rds(out, fname)
 
 
 
