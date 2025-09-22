@@ -38,6 +38,7 @@ df$n_values = df$n_bad = NA
 max_n = nrow(df)
 index = 1
 for (index in seq(max_n)) {
+  # for (index in 36:nrow(df)) {
   # print(index)
   idf = df[index,]
   print(paste0(index, " of ", max_n))
@@ -52,12 +53,14 @@ for (index in seq(max_n)) {
       filter(SEQN %in% idf$id) %>%
       collect()
 
-    mims = read_csv(idf$file_mims)
-    stopifnot(nrow(mims) == nrow(paxmims))
+    mims = read_csv(idf$file_mims, progress = FALSE, show_col_types = FALSE)
+    stopifnot(nrow(paxmims) == nrow(mims) |
+                (nrow(paxmims) + 1) == nrow(mims))
+    mims = mims[1:nrow(paxmims),]
 
     mims = mims %>%
       select(time = HEADER_TIME_STAMP, MIMS_UNIT)
-    stopifnot(nrow(paxmims) == nrow(mims))
+
     paxmims$MIMS_UNIT = mims$MIMS_UNIT
 
     paxmims = paxmims %>%

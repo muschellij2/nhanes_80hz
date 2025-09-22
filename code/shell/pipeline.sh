@@ -71,7 +71,8 @@ Rnosave code/R/run_ac_nonwear_sleep.R -J SLEEP --array=1-200 --mem=10G -o %x_%A_
 Rnosave code/R/run_calibration.R -J CALIBRATE --array=1-200 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 Rnosave code/R/run_calibration.R -J CALIBRATE --array=1,2,4-9 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
-Rnosave code/R/05_output_run_mims.R -J MIMS --array=6-200 --mem=40G  -o %x_%A_%a.out -e %x_%A_%a.err
+Rnosave code/R/05_output_run_mims.R -J MIMS --array=12,161 --mem=40G  -o %x_%A_%a.out -e %x_%A_%a.err
+Rnosave code/R/10_mims_comparison.R -J CHECKMIMS --mem=10G  -o %x_%A.out -e %x_%A.err
 
 
 Rnosave code/R/run_GGIR.R -J GGIR --array=1-200 -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
