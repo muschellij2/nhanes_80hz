@@ -49,8 +49,9 @@ for (index in seq(max_n)) {
   ) {
 
     ds <- open_dataset(ss[[idf$version]])
+    iid = as.numeric(idf$id)
     paxmims = ds %>%
-      filter(SEQN %in% idf$id) %>%
+      filter(SEQN == iid) %>%
       collect()
 
     mims = read_csv(idf$file_mims, progress = FALSE, show_col_types = FALSE)
