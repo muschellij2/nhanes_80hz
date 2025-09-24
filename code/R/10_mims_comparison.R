@@ -56,7 +56,10 @@ for (index in seq(max_n)) {
 
     mims = read_csv(idf$file_mims, progress = FALSE, show_col_types = FALSE)
     stopifnot(nrow(paxmims) == nrow(mims) |
-                (nrow(paxmims) + 1) == nrow(mims))
+                (nrow(paxmims) + 1) == nrow(mims) |
+                ((nrow(paxmims) + 2) == nrow(mims)  & idf$id %in% c("62313")) |
+                 ((nrow(paxmims) + 3) == nrow(mims)  & idf$id %in% c("62393"))
+                )
     mims = mims[1:nrow(paxmims),]
 
     mims = mims %>%
