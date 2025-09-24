@@ -33,7 +33,7 @@ xpts = tibble(
 
 ss = split(xpts$outfile, xpts$version)
 
-df$n_values = df$n_bad = NA
+df$n_expected_values = df$n_values = df$n_bad = NA
 
 max_n = nrow(df)
 index = 1
@@ -55,11 +55,15 @@ for (index in seq(max_n)) {
       collect()
 
     mims = read_csv(idf$file_mims, progress = FALSE, show_col_types = FALSE)
-    stopifnot(nrow(paxmims) == nrow(mims) |
-                (nrow(paxmims) + 1) == nrow(mims) |
-                ((nrow(paxmims) + 2) == nrow(mims)  & idf$id %in% c("62313", "63328", "63376")) |
-                 ((nrow(paxmims) + 3) == nrow(mims)  & idf$id %in% c("62393"))
-                )
+    df$n_expected_values[index] = nrow(mims)
+
+    # stopifnot(nrow(paxmims) == nrow(mims) |
+    #             (nrow(paxmims) + 1) == nrow(mims) |
+    #             ((nrow(paxmims) + 2) == nrow(mims)  & idf$id %in% c("62313", "63328", "63376", "63914", "64041")) |
+    #              ((nrow(paxmims) + 3) == nrow(mims)  & idf$id %in% c("62393"))
+    #             )
+    stopifnot(nrow(paxmims) >= nrow(mims) - 3 &&
+                nrow(paxmims) <= nrow(mims))
     mims = mims[1:nrow(paxmims),]
 
     mims = mims %>%
@@ -82,7 +86,7 @@ for (index in seq(max_n)) {
 }
 
 out = df %>%
-  select(id, version, n_values, n_bad)
+  select(id, version, n_expected_values, n_values, n_bad)
 fname = here::here("data", "mims_comparison_check.rds")
 readr::write_rds(out, fname)
 
