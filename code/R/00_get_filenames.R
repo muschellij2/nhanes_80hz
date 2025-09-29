@@ -109,6 +109,8 @@ get_version_filenames = function(nhanes_version) {
                                       folder_name, id),
       counts_60s_from_30Hz_file = make_csv_name(paste0("counts_60s_from30Hz", suffix),
                                       folder_name, id),
+      counts_60s_lfe_from_30Hz_file = make_csv_name(paste0("counts_60s_lfe_from30Hz", suffix),
+                                                folder_name, id),
 
       counts_file = make_csv_name(paste0("counts", suffix),
                                   folder_name, id),
