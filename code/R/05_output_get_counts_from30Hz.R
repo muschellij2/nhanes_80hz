@@ -19,8 +19,8 @@ if (!is.na(ifold)) {
 
 xdf = df
 
-df = df %>%
-  dplyr::filter(file.exists(csv_file))
+# df = df %>%
+#   dplyr::filter(file.exists(csv_file))
 
 max_n = nrow(df)
 index = 1
