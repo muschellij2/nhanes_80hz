@@ -19,7 +19,7 @@ if (!is.na(ifold)) {
   df = df %>%
     dplyr::filter(fold %in% ifold)
 }
-force = TRUE
+force = FALSE
 
 max_n = nrow(df)
 index = 1
