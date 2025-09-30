@@ -77,8 +77,11 @@ for (index in seq(max_n)) {
       df30 = readr::read_csv(idf$csv30_file, progress = FALSE)
       df30 = df30 %>%
         rename(time = HEADER_TIMESTAMP)
-
       attr(df30, "sample_rate") = 30L
+
+      if (all(df30$X == 0 & df30$Y == 0 & df30$Z == 0)) {
+        warning(paste0(idf$id, " has all zero values"))
+      }
       try({
         agresult = agcounts::calculate_counts(
           df30,
