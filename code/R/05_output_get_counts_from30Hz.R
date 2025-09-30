@@ -79,21 +79,23 @@ for (index in seq(max_n)) {
         rename(time = HEADER_TIMESTAMP)
 
       attr(df30, "sample_rate") = 30L
-      agresult = agcounts::calculate_counts(
-        df30,
-        epoch = 60L,
-        lfe_select = TRUE)
-      agresult = agresult %>%
-        rename(HEADER_TIMESTAMP = time,
-               Y = Axis1,
-               X = Axis2,
-               Z = Axis3,
-               AC = Vector.Magnitude) %>%
-        select(HEADER_TIMESTAMP, X, Y, Z, AC)
-      readr::write_csv(
-        agresult,
-        gzfile(idf$counts_60s_lfe_from_30Hz_file, compress = 9L)
-      )
+      try({
+        agresult = agcounts::calculate_counts(
+          df30,
+          epoch = 60L,
+          lfe_select = TRUE)
+        agresult = agresult %>%
+          rename(HEADER_TIMESTAMP = time,
+                 Y = Axis1,
+                 X = Axis2,
+                 Z = Axis3,
+                 AC = Vector.Magnitude) %>%
+          select(HEADER_TIMESTAMP, X, Y, Z, AC)
+        readr::write_csv(
+          agresult,
+          gzfile(idf$counts_60s_lfe_from_30Hz_file, compress = 9L)
+        )
+      })
     }
     # df = read_80hz(idf$csv_file)
     # x = agcounter::get_counts(
