@@ -81,24 +81,32 @@ for (index in seq(max_n)) {
 
       if (all(df30$X == 0 & df30$Y == 0 & df30$Z == 0)) {
         warning(paste0(idf$id, " has all zero values"))
-      }
-      try({
+        # bug with trim a bit - may need to lop, but should all be zero
         agresult = agcounts::calculate_counts(
           df30,
           epoch = 60L,
-          lfe_select = TRUE)
-        agresult = agresult %>%
-          rename(HEADER_TIMESTAMP = time,
-                 Y = Axis1,
-                 X = Axis2,
-                 Z = Axis3,
-                 AC = Vector.Magnitude) %>%
-          select(HEADER_TIMESTAMP, X, Y, Z, AC)
-        readr::write_csv(
-          agresult,
-          gzfile(idf$counts_60s_lfe_from_30Hz_file, compress = 9L)
-        )
-      })
+          lfe_select = FALSE)
+        stopifnot(all(is.na(agresult$Axis1) & is.na(agresult$YAxis2) &
+                        is.na(agresult$Axis3) & is.na(agresult$Vector.Magnitude)))
+      } else {
+        try({
+          agresult = agcounts::calculate_counts(
+            df30,
+            epoch = 60L,
+            lfe_select = TRUE)
+        })
+      }
+      agresult = agresult %>%
+        rename(HEADER_TIMESTAMP = time,
+               Y = Axis1,
+               X = Axis2,
+               Z = Axis3,
+               AC = Vector.Magnitude) %>%
+        select(HEADER_TIMESTAMP, X, Y, Z, AC)
+      readr::write_csv(
+        agresult,
+        gzfile(idf$counts_60s_lfe_from_30Hz_file, compress = 9L)
+      )
     }
     # df = read_80hz(idf$csv_file)
     # x = agcounter::get_counts(

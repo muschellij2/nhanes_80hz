@@ -38,7 +38,7 @@ for (index in seq(max_n)) {
   )
   # force re-run if MIMS_UNIT not found
   if (file.exists(idf$measures_file)) {
-    x = readr::read_csv(idf$measures_file)
+    x = readr::read_csv(idf$measures_file, progress = FALSE, show_col_types = FALSE)
     if (!"MIMS_UNIT" %in% colnames(x)) {
       file.remove(idf$measures_file)
     }
