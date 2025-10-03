@@ -90,3 +90,7 @@ sbatch code/shell/run_accProcess.sh
 accProcess 62467.csv.gz --timeZone UTC --csvTimeFormat 'yyyy-MM-dd HH:mm:ss.SSS' --csvTimeXYZTempColsIndex 0,1,2,3 --sampleRate 80 --deleteIntermediateFiles False --outputFolder ./test
 # --deleteIntermediateFiles False
 # --outputFolder ./test
+
+
+Rnosave code/R/999_check_min_times.R -J CHECK --mem=10G -o %x_%A.out -e %x_%A.err
+
