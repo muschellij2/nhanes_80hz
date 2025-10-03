@@ -13,7 +13,7 @@ rm(list = c("fold"))
 
 df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 df = df %>%
-  mutate(rawmin_file = here::here("data/raw_min", idf$version, paste0(idf$id, ".csv.gz")))
+  mutate(rawmin_file = here::here("data/raw_min", df$version, paste0(df$id, ".csv.gz")))
 xdf = df
 ifold = get_fold()
 if(!is.na(ifold)) {
