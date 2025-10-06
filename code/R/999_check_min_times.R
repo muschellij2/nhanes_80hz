@@ -61,6 +61,10 @@ for (index in seq(max_n)) {
   end_times = as.character(hms::as_hms(c(floor_date(end_time_raw, "1 sec"),
                                          round_date(end_time_raw, "1 sec"),
                                          ceiling_date(end_time_raw, "1 sec"))))
+  ihd$PAXETLDY = trimws(ihd$PAXETLDY)
+  ihd$PAXETLDY = paste(sprintf("%02.0f",
+                               as.numeric(strsplit(ihd$PAXETLDY, ":")[[1]])),
+                       collapse = ":")
   stopifnot(ihd$PAXETLDY %in% end_times )
 
 

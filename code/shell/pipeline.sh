@@ -92,5 +92,5 @@ accProcess 62467.csv.gz --timeZone UTC --csvTimeFormat 'yyyy-MM-dd HH:mm:ss.SSS'
 # --outputFolder ./test
 
 
-Rnosave code/R/999_check_min_times.R -J CHECK --mem=10G -o %x_%A.out -e %x_%A.err
+Rnosave code/R/999_check_min_times.R -J CHECK --array=1-5 --mem=10G -o %x_%A_%a.out -e %x_%A_%a.err
 
