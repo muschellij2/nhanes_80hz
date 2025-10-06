@@ -31,6 +31,12 @@ hd = purrr::map_df(hd_files, haven::read_xpt, .id = "version")
 
 max_n = nrow(df)
 index = 1
+zero_pad_time = function(x) {
+  x = trimws(x)
+  parts = strsplit(x, ":")[[1]]
+  parts = sprintf("%02.0f", as.numeric(parts))
+  paste(parts, collapse = ":")
+}
 for (index in seq(max_n)) {
   idf = df[index, ]
   print(paste0(index, " of ", max_n))
@@ -57,15 +63,13 @@ for (index in seq(max_n)) {
   end_time_raw = as.POSIXct(output[2], format = "%Y-%m-%dT%H:%M:%OSZ", tz="UTC")
 
   stopifnot(start_time == start_time_raw)
+  ihd$PAXFTIME = zero_pad_time(ihd$PAXFTIME)
   stopifnot(ihd$PAXFTIME == as.character(hms::as_hms(start_time)))
   end_times = as.character(hms::as_hms(c(floor_date(end_time_raw, "1 sec"),
                                          round_date(end_time_raw, "1 sec"),
                                          ceiling_date(end_time_raw, "1 sec"))))
-  ihd$PAXETLDY = trimws(ihd$PAXETLDY)
-  ihd$PAXETLDY = paste(sprintf("%02.0f",
-                               as.numeric(strsplit(ihd$PAXETLDY, ":")[[1]])),
-                       collapse = ":")
-  stopifnot(ihd$PAXETLDY %in% end_times )
+  ihd$PAXETLDY = zero_pad_time(ihd$PAXETLDY)
+  stopifnot(ihd$PAXETLDY %in% end_times)
 
 
 }
