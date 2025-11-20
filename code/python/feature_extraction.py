@@ -63,8 +63,8 @@ class AccelerometryProcessor:
     def __init__(self, target_hz: int = 100):
         self.target_hz = target_hz
     
-    def load_csv(self, csv_path: str, time_col: str = 'time', 
-                 x_col: str = 'x', y_col: str = 'y', z_col: str = 'z',
+    def load_csv(self, csv_path: str, time_col: str = 'HEADER_TIMESTAMP', 
+                 x_col: str = 'X', y_col: str = 'Y', z_col: str = 'Z',
                  patient_id: Optional[str] = None) -> Dict:
         """
         Load accelerometry data from CSV
