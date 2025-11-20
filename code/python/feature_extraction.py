@@ -63,8 +63,8 @@ class AccelerometryProcessor:
     def __init__(self, target_hz: int = 100):
         self.target_hz = target_hz
     
-    def load_csv(self, csv_path: str, time_col: str = 'HEADER_TIMESTAMP', 
-                 x_col: str = 'X', y_col: str = 'Y', z_col: str = 'Z',
+    def load_csv(self, csv_path: str, time_col: str = 'time', 
+                 x_col: str = 'x', y_col: str = 'y', z_col: str = 'z',
                  patient_id: Optional[str] = None) -> Dict:
         """
         Load accelerometry data from CSV
@@ -83,6 +83,35 @@ class AccelerometryProcessor:
         # Load CSV
         df = pd.read_csv(csv_path)
         
+        # Normalize column names
+        # First, lowercase all column names
+        df.columns = df.columns.str.lower()
+        
+        # Map common timestamp column variations to 'time'
+        timestamp_mappings = {
+            'header_timestamp': 'time',
+            'header_time_stamp': 'time',
+            'timestamp': 'time',
+            'time_stamp': 'time'
+        }
+        
+        # Apply timestamp mappings
+        for old_name, new_name in timestamp_mappings.items():
+            if old_name in df.columns:
+                df = df.rename(columns={old_name: new_name})
+                print(f"  Renamed column '{old_name}' to '{new_name}'")
+                break
+
+        # Check if we have the required columns after normalization
+        required_cols = [time_col, x_col, y_col, z_col]
+        missing_cols = [col for col in required_cols if col not in df.columns]
+        
+        if missing_cols:
+            print(f"  Available columns after normalization: {list(df.columns)}")
+            raise ValueError(f"Missing required columns: {missing_cols}")
+        
+        print(f"  Using columns: time='{time_col}', x='{x_col}', y='{y_col}', z='{z_col}'")
+
         # Parse timestamps
         df[time_col] = pd.to_datetime(df[time_col])
         df = df.sort_values(time_col).reset_index(drop=True)
