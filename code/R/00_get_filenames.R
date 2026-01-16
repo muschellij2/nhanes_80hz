@@ -192,6 +192,12 @@ get_version_filenames = function(nhanes_version) {
 
   df = df %>%
     dplyr::mutate(
+      sleep_file = make_csv_name(paste0("sleep", suffix),
+                                 folder_name, id)
+    )
+
+  df = df %>%
+    dplyr::mutate(
       measures_file = make_csv_name(paste0("measures", suffix),
                                     folder_name, id)
     )
