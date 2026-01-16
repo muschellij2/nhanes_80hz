@@ -40,8 +40,7 @@ for (i in seq_len(nrow(df))) {
   if (!all(file.exists(outfiles)) && !idf$all_zero) {
 
     out = try({
-      asleep(file = idf$time_csv_file,
-             model_path = model_path)
+      asleep(file = idf$time_csv_file)
     })
     # errors can happen if all the data is zero
     if (!inherits(out, "try-error")) {
