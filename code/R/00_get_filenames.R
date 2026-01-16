@@ -197,7 +197,7 @@ get_version_filenames = function(nhanes_version) {
     dplyr::mutate(
       sleep_file = make_csv_name(paste0("sleep", suffix),
                                  folder_name, id),
-      sleep_full_file = make_rds_name(paste0("sleep", suffix),
+      sleep_output_file = make_rds_name(paste0("sleep_output", suffix),
                                       folder_name, id)
     )
 
