@@ -83,6 +83,9 @@ get_version_filenames = function(nhanes_version) {
   make_csv_name = function(dir, folder_name, id) {
     here::here("data", dir, folder_name, paste0(id, ".csv.gz"))
   }
+  make_rds_name = function(dir, folder_name, id) {
+    here::here("data", dir, folder_name, paste0(id, ".rds"))
+  }
   df = df %>%
     dplyr::mutate(
       day_of_week = sub(",$", "", day_of_week),
@@ -193,7 +196,9 @@ get_version_filenames = function(nhanes_version) {
   df = df %>%
     dplyr::mutate(
       sleep_file = make_csv_name(paste0("sleep", suffix),
-                                 folder_name, id)
+                                 folder_name, id),
+      sleep_full_file = make_rds_name(paste0("sleep", suffix),
+                                      folder_name, id)
     )
 
   df = df %>%
