@@ -61,6 +61,8 @@ Rnosave code/R/flag_all_zero.R -J ZERO --mem=8G -o %x_%A.out -e %x_%A.err --time
 Rnosave code/R/run_stepcount.R -J STEPCOUNT --array=32,49,66,71,102 --mem=50G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 Rnosave code/R/run_stepcount.R -J STEPCOUNT --array=187 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
+Rnosave code/R/05_output_run_asleep.R -J SLEEP --array=1-5 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
+
 Rnosave code/R/run_nonwear_weartime.R -J WEARTIME --array=40,73,156 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 Rnosave code/R/run_nonwear_swan.R -J SWAN --array=8,18,39,110 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 # Rnosave code/R/run_nonwear_swan.R -J SWAN --array=1-64,66,74,84,88,89,92,93,110,118 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00

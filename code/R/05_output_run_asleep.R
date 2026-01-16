@@ -45,6 +45,9 @@ for (i in seq_len(nrow(df))) {
     })
     # errors can happen if all the data is zero
     if (!inherits(out, "try-error")) {
+      try({
+        lapply(out$paths, file.remove)
+      })
       readr::write_rds(out, idf$sleep_output_file, compress = "gz")
       write_csv_gz(out$predictions, idf$sleep_file)
     }
