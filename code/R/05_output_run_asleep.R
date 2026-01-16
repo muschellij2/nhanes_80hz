@@ -41,7 +41,7 @@ for (i in seq_len(nrow(df))) {
 
     out = try({
       asleep(file = idf$time_csv_file,
-             model_path = model_path)
+             local_repo_path = here::here("asleep"))
     })
     # errors can happen if all the data is zero
     if (!inherits(out, "try-error")) {
