@@ -36,3 +36,4 @@ acctest
 docs/*_cache
 docs/*.tar.bz2
 docs/fingerprint_walking.rds
+.positai

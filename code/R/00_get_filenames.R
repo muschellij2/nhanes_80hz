@@ -243,6 +243,14 @@ get_version_filenames = function(nhanes_version) {
         folder_name, paste0(id, "-timeSeries"))
     )
 
+  ## actinet outputs
+  df = df %>%
+    dplyr::mutate(
+      actinet = make_csv_name(
+        "actinet",
+        folder_name, id)
+    )
+
   df = df %>%
     dplyr::mutate(version = folder_name) %>%
     dplyr::select(version, id, url, tarball_file, filename,
