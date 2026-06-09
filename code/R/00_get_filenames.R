@@ -246,7 +246,7 @@ get_version_filenames = function(nhanes_version) {
   ## actinet outputs
   df = df %>%
     dplyr::mutate(
-      actinet = make_csv_name(
+      actinet_file = make_csv_name(
         "actinet",
         folder_name, id)
     )
