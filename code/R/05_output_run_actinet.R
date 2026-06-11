@@ -43,7 +43,8 @@ for (i in seq_len(nrow(df))) {
   outfiles = unlist(idf[,sleep_cols])
   if (!all(file.exists(outfiles)) && !idf$all_zero) {
     out = try({
-      actinet::actinet(file = idf$time_csv_file, sample_rate = 80L)
+      actinet::actinet(file = idf$time_csv_file, sample_rate = 80L,
+                       classifier = "walmsley")
     })
     # errors can happen if all the data is zero
     if (!inherits(out, "try-error")) {
