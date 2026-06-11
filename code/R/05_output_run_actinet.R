@@ -31,9 +31,9 @@ sleep_cols = c("actinet_file")
 
 model_dir = here::here("actinet_models")
 
-out = try({
-  actinet::actinet(file = df$time_csv_file[1], cache_classifier = TRUE)
-})
+# out = try({
+#   actinet::actinet(file = df$time_csv_file[1], cache_classifier = TRUE)
+# })
 for (i in seq_len(nrow(df))) {
   idf = df[i,]
   print(paste0(i, " of ", nrow(df)))

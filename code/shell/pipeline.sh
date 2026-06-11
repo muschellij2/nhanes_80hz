@@ -63,8 +63,7 @@ Rnosave code/R/run_stepcount.R -J STEPCOUNT --array=187 --mem=35G -o %x_%A_%a.ou
 
 Rnosave code/R/05_output_run_asleep.R -J SLEEP --array=1-200 --mem=35G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
-Rnosave code/R/05_output_run_actinet.R -J ACTINET --array=6-200 --mem=15G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
-Rnosave code/R/05_output_run_actinet.R -J REST_ACTINET --partition=interactive --mem=15G -o %x_%A.out -e %x_%A.err --time=4-00:00:00
+Rnosave code/R/05_output_run_actinet.R -J ACTINET --array=1-200 --mem=15G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
 
 
 Rnosave code/R/run_nonwear_weartime.R -J WEARTIME --array=40,73,156 --mem=20G -o %x_%A_%a.out -e %x_%A_%a.err --time=4-00:00:00
