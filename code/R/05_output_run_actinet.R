@@ -10,6 +10,8 @@ source(here::here("code", "R", "utils.R"))
 fold = NULL
 rm(list = c("fold"))
 
+builtins <- reticulate::import_builtins()
+js = reticulate::import("json")
 
 df = readRDS(here::here("data", "raw", "all_filenames.rds"))
 xdf = df
@@ -49,6 +51,15 @@ for (i in seq_len(nrow(df))) {
     # errors can happen if all the data is zero
     if (!inherits(out, "try-error")) {
       file.copy(out$outfiles[1], idf$actinet_file, overwrite = TRUE)
+      f = builtins$open(out$outfiles[2], "r")
+      x <- js$load(f)
+      f$close()
+      stopifnot(x$SampleRate == 80L)
+      stopifnot(x$ResampleRate == 80L)
+
+      # x$ActiNetArgs = NULL
+      # xdf = as.data.frame(x)
+
     }
     rm(out)
   }
