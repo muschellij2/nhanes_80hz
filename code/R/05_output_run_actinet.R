@@ -49,7 +49,7 @@ for (i in seq_len(nrow(df))) {
                        classifier = "walmsley")
     })
     # errors can happen if all the data is zero
-    if (!inherits(out, "try-error")) {
+    if (!inherits(out, "try-error") && file.exists(out$outfiles[1])) {
       file.copy(out$outfiles[1], idf$actinet_file, overwrite = TRUE)
       stopifnot(file.exists(idf$actinet_file))
       f = builtins$open(out$outfiles[2], "r")
